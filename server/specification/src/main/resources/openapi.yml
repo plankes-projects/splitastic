@@ -1,0 +1,832 @@
+openapi: 3.0.0
+info:
+  title: My API
+  description: API for the app.
+  version: 0.0.1
+
+servers:
+  - url: https://localhost
+    description: This server
+  - url: http://localhost
+    description: This server with http. This is used during development.
+
+tags:
+  - name: "General"
+  - name: "Autentication"
+  - name: "Group"
+  - name: "User"
+  - name: "Finance"
+  - name: "Chore"
+
+paths:
+  /ping:
+    get:
+      tags:
+        - "General"
+      summary: Returns pong.
+      responses:
+        '200':    # status code
+          description: Pong is returned.
+          content:
+            application/json:
+              schema:
+                type: string
+              example:   # Sample object
+                pong
+  /version:
+    get:
+      tags:
+        - "General"
+      summary: Returns the version of the API endpoint.
+      responses:
+        '200':    # status code
+          description: Pong is returned.
+          content:
+            application/json:
+              schema:
+                type: string
+              example:   # Sample object
+                2.0.1
+  /login:
+    post:
+      tags:
+        - "Autentication"
+      summary: The server will send an approval link per email. After approval the token is valid and linked to the provided email. This token can then be used once to retrieve the permanent token.
+      parameters:
+        - in: query
+          name: email
+          required: true
+          schema:
+            type: string
+          description: The email of the user.
+      responses:
+        '200':    # status code
+          description: Returnes the id of the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loginData'
+    get:
+      tags:
+        - "Autentication"
+      summary: This will be called by a user from an email. After this is called, the temporary token linked to this proof is activated.
+      parameters:
+        - in: query
+          name: secret
+          required: true
+          schema:
+            type: string
+          description: The secret send to the email.
+      responses:
+        '200':    # status code
+          description: The token linked to this proof is now activated.
+          content:
+            text/html:
+              schema:
+                type: string
+                example: The device is now loggedin
+        '204':
+          description: Resource not found.
+
+    put:
+      tags:
+        - "Autentication"
+      summary: Use this with the temporary token to retrieve the permanent token.
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: string
+          description: The login token.
+      responses:
+        '200':    # status code
+          description: Successfully retrieved the permanent token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/loginDataSuccess'
+        '204':
+          description: Resource not found.
+
+  /group:
+    post:
+      tags:
+        - "Group"
+      summary:  Creates a new group.
+      responses:
+        '200':    # status code
+          description: Returnes the id of the new group.
+          content:
+            application/json:
+              schema:
+                type: integer
+              example:   # Sample object
+                123
+
+    get:
+      tags:
+        - "Group"
+      summary: Returns the details of all groups of the user.
+      parameters:
+        - in: query
+          name: num
+          required: true
+          schema:
+            type: integer
+            maximum: 50
+            minimum: 5
+            example: 10
+          description: The max number of entries to return.
+        - in: query
+          name: lastId
+          schema:
+            type: integer
+            example: 5
+          description: If present, entries after this id are returned.
+      responses:
+        '200':
+          description: All groups of the user.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/group'
+    put:
+      tags:
+        - "Group"
+      summary: Updates a group.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/group'
+      responses:
+        '200':
+          description: The task was successfully inserted.
+        '204':
+          description: Resource not found.
+
+  /group/{groupId}:
+    get:
+      tags:
+        - "Group"
+      summary: Returns the details of the specified group.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+      responses:
+        '200':
+          description: Successful call
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/group'
+        '204':
+          description: Resource not found.
+
+    delete:
+      tags:
+        - "Group"
+      summary: Removes the group.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+      responses:
+        '200':
+          description: The task was successfully inserted.
+        '204':
+          description: Resource not found.
+
+  /user:
+    get:
+      tags:
+        - "User"
+      summary:  Returns user information of the current user.
+      responses:
+        '200':    # status code
+          description: Successful call
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+    put:
+      tags:
+        - "User"
+      summary:  Modifies current user information.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+      responses:
+        '200':    # status code
+          description: Successful call
+
+  /user/resetApiKey:
+    put:
+      tags:
+        - "User"
+      summary:  Resets the api key of the user. This results in a logout on all devices.
+      responses:
+        '200':    # status code
+          description: Successfully resetted the api key.
+
+  /group/{groupId}/join:
+    put:
+      tags:
+        - "User"
+      summary:  Adds the user to this group if an invite is pending.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+      responses:
+        '200':    # status code
+          description: Successfully added the user to the group
+        '204':
+          description: Resource not found.
+
+  /group/{groupId}/user/{email}:
+    put:
+      tags:
+        - "User"
+      summary:  Invites a user to this group.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+          description: The email of the new user.
+      responses:
+        '200':    # status code
+          description: Successfully sent the invite link to the user.
+        '204':
+          description: Resource not found.
+
+  /user/invite:
+    get:
+      tags:
+        - "User"
+      summary: Returns all open invites of the user.
+      responses:
+        '200':
+          description: All invites of the user.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/invite'
+
+  /group/invite/{groupId}:
+    get:
+      tags:
+        - "Group"
+      summary: Returns all open invites of this group.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the invite.
+      responses:
+        '200':
+          description: All invites of the user.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/invite'
+  /group/invite/{inviteId}:
+    delete:
+      tags:
+        - "Group"
+      summary:  Removes an invite from the group.
+      parameters:
+        - in: path
+          name: inviteId
+          required: true
+          schema:
+            type: integer
+          description: The id of the invite.
+      responses:
+        '200':    # status code
+          description: Successfully removed the user.
+        '204':
+          description: Resource not found.
+
+  /group/{groupId}/user/{userId}:
+    delete:
+      tags:
+        - "User"
+      summary:  Removes a user from the group.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          description: The id of the user.
+      responses:
+        '200':    # status code
+          description: Successfully removed the user.
+        '204':
+          description: Resource not found.
+
+  /group/{groupId}/finance:
+    post:
+      tags:
+        - "Finance"
+      summary:  Creates a new finance entry in the group.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/financeEntry'
+
+      responses:
+        '200':    # status code
+          description: Returnes the id of the new group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/financeEntry'
+              example:   # Sample object
+                123
+        '204':
+          description: Resource not found.
+
+    get:
+      tags:
+        - "Finance"
+      summary: Returns the details of all finance entries in this group.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+        - in: query
+          name: num
+          required: true
+          schema:
+            type: integer
+            maximum: 50
+            minimum: 5
+            example: 10
+          description: The max number of entries to return.
+        - in: query
+          name: lastId
+          schema:
+            type: integer
+            example: 5
+          description: If present, entries after this id are returned. Otherwise the newest X are returned.
+      responses:
+        '200':
+          description: All finance entries of the group.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/financeEntry'
+        '204':
+          description: Resource not found.
+
+  /group/{groupId}/finance/titleSuggestions:
+    get:
+      tags:
+        - "Finance"
+      summary: Returns some title suggestions.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+      responses:
+        '200':
+          description: All finance entries of the group.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example: [grocery, tech, food]
+        '204':
+          description: Resource not found.
+
+
+  /finance:
+    put:
+      tags:
+        - "Finance"
+      summary: Updates a finance entry.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/financeEntry'
+      responses:
+        '200':
+          description: The task was successfully inserted.
+        '204':
+          description: Resource not found.
+
+  /finance/{financeId}:
+    get:
+      tags:
+        - "Finance"
+      summary: Returns the details of the specified finance entry.
+      parameters:
+        - in: path
+          name: financeId
+          required: true
+          schema:
+            type: integer
+          description: The id of the finance entry.
+      responses:
+        '200':
+          description: Successful call
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/financeEntry'
+        '204':
+          description: Resource not found.
+
+    delete:
+      tags:
+        - "Finance"
+      summary: Removes the finance entry.
+      parameters:
+        - in: path
+          name: financeId
+          required: true
+          schema:
+            type: integer
+          description: The id of the finance entry.
+      responses:
+        '200':
+          description: The task was successfully inserted.
+        '204':
+          description: Resource not found.
+  /chore:
+    post:
+      tags:
+        - "Chore"
+      summary:  Creates a new chore.
+      parameters:
+        - in: query
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+      responses:
+        '200':    # status code
+          description: Returnes the id of the new chore.
+          content:
+            application/json:
+              schema:
+                type: integer
+              example:   # Sample object
+                123
+
+    put:
+      tags:
+        - "Chore"
+      summary: Updates a chore.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/chore'
+      responses:
+        '200':
+          description: The task was successfully inserted.
+        '204':
+          description: Resource not found.
+
+  /chore/{choreId}:
+    get:
+      tags:
+        - "Chore"
+      summary:  Gets the details of a chore.
+      parameters:
+        - in: path
+          name: choreId
+          required: true
+          schema:
+            type: integer
+          description: The id of the chore.
+      responses:
+        '200':    # status code
+          description: All summaries for this group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/chore'
+
+    delete:
+      tags:
+        - "Chore"
+      summary:  Deletes a chore.
+      parameters:
+        - in: path
+          name: choreId
+          required: true
+          schema:
+            type: integer
+          description: The id of the chore.
+      responses:
+        '200':
+          description: Success
+
+    post:
+      tags:
+        - "Chore"
+      summary:  Creates a new entry in the chore.
+      parameters:
+        - in: path
+          name: choreId
+          required: true
+          schema:
+            type: integer
+          description: The id of the chore.
+      responses:
+        '200':    # status code
+          description: Success
+
+  /chore/summaries/{groupId}:
+    get:
+      tags:
+        - "Chore"
+      summary:  Gets the summary of the chore.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+      responses:
+        '200':    # status code
+          description: All summaries for this group.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/choreSummary'
+
+  /chore/{choreId}/entry:
+    delete:
+      tags:
+        - "Chore"
+      summary:  Deletes the latest chore entry of the user.
+      parameters:
+        - in: path
+          name: choreId
+          required: true
+          schema:
+            type: integer
+          description: The id of the chore.
+      responses:
+        '200':
+          description: Success
+
+components:
+  securitySchemes:
+    ApiKeyAuthHeader:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+
+  schemas:
+    invite:
+      description: An invite object.
+      type: object
+      properties:
+        id:
+          type: integer
+        group:
+          $ref: '#/components/schemas/group'
+        email:
+          type: string
+    group:
+      description: All information of this group.
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: The Smurfs
+          description: The name of the group.
+        description:
+          type: string
+          example: Contains all spending of the Smurfs
+          description: The description of the group.
+        owner:
+          type: integer
+          description: The owner userId of the group.
+        balance:
+          type: number
+          description: the current balance of the user.
+        image:
+          $ref: '#/components/schemas/imageData'
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/user'
+
+    chore:
+      description: All information of the chore.
+      type: object
+      properties:
+        id:
+          type: integer
+        created:
+          type: string
+          format: date-time
+        title:
+          type: string
+          nullable: false
+          example: Dishwasher
+          description: The title of the chore
+        description:
+          type: string
+          nullable: false
+          example: Emptied the dishwasher
+          description: The description of the chore
+        isOwner:
+          type: boolean
+          nullable: false
+          example: true
+
+    choreSummary:
+      description: A finish of a chore.
+      type: object
+      properties:
+        chore:
+          $ref: '#/components/schemas/chore'
+        doneArray:
+          type: array
+          items:
+            $ref: '#/components/schemas/choreSummaryArrayEntry'
+
+    choreSummaryArrayEntry:
+      description: A finish of a chore.
+      type: object
+      properties:
+        userId:
+          type: integer
+          nullable: false
+          example: 5
+        count:
+          type: integer
+          nullable: false
+          example: 6
+
+    financeEntry:
+      description: All information of this finance entry.
+      type: object
+      properties:
+        id:
+          type: integer
+        created:
+          type: string
+          format: date-time
+        title:
+          type: string
+          nullable: false
+          example: Spar
+          description: The title of the entry
+        spentFrom:
+          type: integer
+          example: 6
+          nullable: false
+          description: The user id of the spender.
+        spent:
+          type: array
+          items:
+            $ref: '#/components/schemas/financeEntryEntry'
+
+    financeEntryEntry:
+      description: The amount spend for the user.
+      type: object
+      properties:
+        id:
+          type: integer
+        spentFor:
+          type: integer
+          example: 7
+          nullable: false
+          description: The user ids the amount was spent for.
+        amount:
+          type: number
+          example: 10.5
+          nullable: false
+          description: The amount of money spent.
+
+    loginData:
+      description: All information needed for the login.
+      type: object
+      properties:
+        email:
+          type: string
+          example: example.mail@gmx.com
+          description: email of the user
+        token:
+          type: string
+          example: ea759244-e88e-41e6-ada9-2904c33445fd
+          description: A temporary login token.
+        verify:
+          type: string
+          example: ABBZ
+          description: Random 4 char for easy optical verification within the email.
+
+    loginDataSuccess:
+      description: Data retrieved after a successful login.
+      type: object
+      properties:
+        userId:
+          type: integer
+          example: 5
+          description: id of the user
+        token:
+          type: string
+          example: ea759244-e88e-41e6-ada9-2904c33445fd
+          description: The permanent token.
+
+    user:
+      description: Information of the user.
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          example: example.mail@gmx.com
+          description: email of the user
+        name:
+          type: string
+          example: Max Mustermann
+          description: Name of the user
+        image:
+          $ref: '#/components/schemas/imageData'
+
+    imageData:
+      description: Data on how to display an image.
+      type: object
+      properties:
+        url:
+          type: string
+
+# Apply the API key globally to all operations
+security:
+  - ApiKeyAuthHeader: []     # use the same name as under securitySchemes

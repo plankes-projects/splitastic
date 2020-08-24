@@ -1,0 +1,4 @@
+export default {
+  basePath: "http://localhost:8081",
+  aboutEmail: "email@domain.com",
+};
