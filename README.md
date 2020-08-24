@@ -1,6 +1,7 @@
 # Splitastic
 
-Splitastic is an open source self hosted chores/money splitting app. 
+Splitastic is an open source self hosted chores/money splitting app.
+Mobile phones are first class citizens in this app.
 
 See it in action here: https://splitastic.epicnerf.com/
 
