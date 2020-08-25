@@ -17,7 +17,7 @@ The project consists of 2 parts:
 ### Development Notes
 #### TODOs:
 TODOs are tracked on: https://github.com/plankes-projects/splitastic/projects/1
-#### New API endpoints:
+#### New server API endpoints:
 API endpoints are implemented with server/specification/src/main/resources/openapi.yml (see https://swagger.io/tools/swagger-editor/). Afterwards client and server parts are generated from this file (see readme in server/client).
 
 ### Donate
