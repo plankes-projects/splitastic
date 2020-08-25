@@ -82,6 +82,8 @@ public class LoginApiDelegateImpl implements LoginApiDelegate {
         token.setApproved(true);
         loginTokenRepository.save(token);
 
+        logger.info("Login token approved for: " + token.getUser().getEmail());
+
         return ResponseEntity.ok(loadEmailLinkClickedHtml());
     }
 
