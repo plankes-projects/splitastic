@@ -65,26 +65,28 @@ export default class Chore extends Vue {
   private sortChores() {
     this.choreSums.sort(
       (c1: ChoreSummary, c2: ChoreSummary) =>
-        this.getChoreSortScore(c1) - this.getChoreSortScore(c2)
+        this.getChoreSortScore(c2) - this.getChoreSortScore(c1)
     );
   }
 
   private getChoreSortScore(choreSum: ChoreSummary): number {
     const myCount = this.getCount(this.myUserId, choreSum);
-    const minCount = this.getMinCount(choreSum);
-    return myCount - minCount;
+    const maxCount = this.getMaxOtherCount(choreSum);
+    return maxCount - myCount;
   }
 
-  private getMinCount(choreSum: ChoreSummary): number {
-    let minCount = Number.MAX_VALUE;
+  private getMaxOtherCount(choreSum: ChoreSummary): number {
+    let maxCount = 0;
 
     for (const user of this.group.users!) {
-      const count = this.getCount(user.id!, choreSum);
-      if ((minCount ?? Number.MAX_VALUE) > count) {
-        minCount = count;
+      if (user.id! != this.myUserId) {
+        const count = this.getCount(user.id!, choreSum);
+        if (maxCount < count) {
+          maxCount = count;
+        }
       }
     }
-    return minCount;
+    return maxCount;
   }
 
   private getCount(userId: number, choreSum: ChoreSummary) {
