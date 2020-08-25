@@ -42,7 +42,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 java -jar openapi-generator-cli-4.3.1.jar generate -i server\specification\src\main\resources\openapi.yml -g typescript-axios -o clients\vue\src\generated/api-axios
 Make following changes to api.ts because I did not figure out how to ignore this file yet.
 * Replace 'let headersFromBaseOptions' by 'const headersFromBaseOptions'
-* Add '/// <reference types="node"/>' to the top
+* Add '/// \<reference types="node"/\>' to the top
 
 
 ### This is how you regenerate new icons
