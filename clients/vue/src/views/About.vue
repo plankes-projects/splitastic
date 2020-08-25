@@ -21,7 +21,10 @@
     </div>
     <div class="faq">
       <b>Contribute or contact the dev</b>
-      <br />TODO: link to github repo here
+      <br />
+      <a
+        href="https://github.com/plankes-projects/splitastic"
+      >https://github.com/plankes-projects/splitastic</a>
     </div>
     <div class="faq">
       <b>Send a coffee to the dev</b>
