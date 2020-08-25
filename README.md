@@ -1,5 +1,5 @@
 # Splitastic
-
+testitest
 Splitastic is an open source self hosted chores/expenses splitting app.
 
 Mobile phones are first class citizens in this app. This means you should use this app on a mobile phone for the best experience.
