@@ -161,7 +161,7 @@ public class LoginApiDelegateImpl implements LoginApiDelegate {
         ret.setToken(loginToken.getUser().getToken());
         ret.setUserId(loginToken.getUser().getId());
 
-        loginTokenRepository.delete(loginToken);
+        //loginTokenRepository.delete(loginToken);
         return ResponseEntity.ok(ret);
     }
 }
