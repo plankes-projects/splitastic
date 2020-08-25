@@ -4,11 +4,11 @@ Create app/application.properties from app/application.properties.template and f
 * Provide spring JavaMailSender config
 * Provide custom config variables:
 ##### admin.token 
-###### An admin token with at least length 100. Send this in the header X-ADMIN-TOKEN for an instant login. The VUE client will do so if present in local storage key admin.token
+> An admin token with at least length 100. Send this in the header X-ADMIN-TOKEN for an instant login. The VUE client will do so if present in local storage key admin.token
 ##### server.baseurl
-###### eg http://localhost:8080
+> eg http://localhost:8080
 ##### email.from
-###### This will be used as sender for the login email.
+> This will be used as sender for the login email.
 
 
 # Run:
