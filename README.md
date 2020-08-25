@@ -2,7 +2,7 @@
 
 Splitastic is an open source self hosted chores/money splitting app.
 
-Mobile phones are first class citizens in this app. This means you should use this app on a mobile phone for best experience.
+Mobile phones are first class citizens in this app. This means you should use this app on a mobile phone for the best experience.
 
 See it in action here: https://splitastic.epicnerf.com/
 
