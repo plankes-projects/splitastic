@@ -1,6 +1,6 @@
 # vue
 
-HTML5 History Mode is enabled, therefore you have to add a little configuration to your server. How ot do this is described here:
+HTML5 History Mode is enabled, therefore you have to add a little configuration to your server. How to do this is described here:
 https://router.vuejs.org/guide/essentials/history-mode.html#example-server-configurations
 
 ## Project setup
