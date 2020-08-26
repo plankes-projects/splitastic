@@ -23,5 +23,12 @@ https://github.com/plankes-projects/splitastic/wiki/Quick-start-guide-for-self-h
 ##### Quick start guide for development
 https://github.com/plankes-projects/splitastic/wiki/Quick-start-guide-for-development
 
+## Version convention
+MAJOR.MINOR.PATCH - Each of the parts is incremented according to:
+
+MAJOR, when a change is NOT backwards-compatible (an upgrade to a new MAJOR version will break stuff)
+MINOR, when new functionality is added in a backwards-compatible manner
+PATCH, when bug fixes are made in a backward-compatible manner
+
 ## Donate
 https://epicnerf.com/donate/
