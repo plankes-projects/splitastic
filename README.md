@@ -30,5 +30,5 @@ MAJOR.MINOR.PATCH - Each of the parts is incremented according to:
 * MINOR, when new functionality is added in a backwards-compatible manner
 * PATCH, when bug fixes are made in a backward-compatible manner
  
-## Donate
-https://epicnerf.com/donate/
+## Contribute
+You can either help develop this app (see https://github.com/plankes-projects/splitastic/wiki/Quick-start-guide-for-development) or donate https://epicnerf.com/donate/
