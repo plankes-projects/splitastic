@@ -42,7 +42,6 @@
         <img class="userImage" :src="userAndCount.user.image.url" alt="Image" />
         <div class="name">{{userAndCount.user.name}}</div>
       </div>
-      <div></div>
     </div>
   </div>
 </template>
