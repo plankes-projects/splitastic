@@ -101,7 +101,6 @@ export default class Login extends Vue {
       return;
     }
     try {
-      this.autenticationApi.loginPut(this.loginData.token ?? "");
       const result = await this.autenticationApi.loginPut(
         this.loginData.token ?? ""
       );
