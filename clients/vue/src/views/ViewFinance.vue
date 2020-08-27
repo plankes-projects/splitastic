@@ -58,7 +58,7 @@
           </div>
 
           <b-button
-            v-if="isOwner()"
+            v-if="canDelete()"
             @click="deleteClicked()"
             class="deleteButton"
             type="is-danger"
@@ -96,8 +96,19 @@ export default class ViewFinance extends Vue {
   private fromUser!: User;
   private createdByUser: User | null = null;
 
-  private isOwner() {
-    return localStorage.userId == this.finance.spentFrom;
+  private canDelete() {
+    return (
+      localStorage.userId == this.finance.spentFrom ||
+      (this.group.owner == localStorage.userId && this.isVirtualEntry())
+    );
+  }
+
+  private isVirtualEntry() {
+    for (const user of this.group.users!) {
+      if (user.id == this.finance.spentFrom) {
+        return user.isVirtual;
+      }
+    }
   }
 
   private backClicked() {
