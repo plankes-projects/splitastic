@@ -751,6 +751,10 @@ components:
           example: 6
           nullable: false
           description: The user id of the spender.
+        createdBy:
+          type: integer
+          example: 6
+          description: The user id of the user who inserted this entry.
         spent:
           type: array
           items:

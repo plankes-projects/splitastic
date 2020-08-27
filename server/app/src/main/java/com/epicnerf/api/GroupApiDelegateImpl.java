@@ -94,6 +94,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
     }
 
     public ResponseEntity<FinanceEntry> groupGroupIdFinancePost(Integer groupId, FinanceEntry financeEntry) {
+        User user = apiSupport.getCurrentUser();
         Optional<GroupObject> group = groupObjectRepository.findById(groupId);
         if (group.isPresent()) {
             apiSupport.validateUserIsInGroup(group.get(), financeEntry.getSpentFrom());
@@ -102,6 +103,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
             }
 
             com.epicnerf.hibernate.model.FinanceEntry f = mapper.mapFinance(financeEntry, false);
+            f.setCreatedBy(user);
             f.setGroup(group.get());
             financeRepository.save(f);
 

@@ -125,6 +125,12 @@ export interface FinanceEntry {
      */
     spentFrom?: number;
     /**
+     * The user id of the user who inserted this entry.
+     * @type {number}
+     * @memberof FinanceEntry
+     */
+    createdBy?: number;
+    /**
      * 
      * @type {Array<FinanceEntryEntry>}
      * @memberof FinanceEntry

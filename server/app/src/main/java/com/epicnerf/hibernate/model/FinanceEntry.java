@@ -29,11 +29,22 @@ public class FinanceEntry {
     @ManyToOne(optional = false)
     private User spentFrom;
 
+    @ManyToOne
+    private User createdBy;
+
     @ManyToOne(optional = false)
     private GroupObject group;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FinanceEntryEntry> entries;
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
 
     public GroupObject getGroup() {
         return group;

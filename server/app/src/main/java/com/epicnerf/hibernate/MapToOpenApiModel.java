@@ -84,6 +84,8 @@ public class MapToOpenApiModel {
         f.setTitle(finance.getTitle());
         f.setSpent(mapFinanceEntries(finance.getEntries()));
         f.setCreated(map(finance.getCreateDate()));
+
+        f.setCreatedBy(finance.getCreatedBy() != null ? finance.getCreatedBy().getId() : finance.getSpentFrom().getId());
         return f;
     }
 
