@@ -94,7 +94,7 @@ export default class ViewFinance extends Vue {
   private amount = 0;
   private financeId!: number;
   private fromUser!: User;
-  private createdByUser!: User;
+  private createdByUser: User | null = null;
 
   private isOwner() {
     return localStorage.userId == this.finance.spentFrom;
