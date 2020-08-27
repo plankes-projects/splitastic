@@ -35,6 +35,29 @@ public class User {
     @OneToOne(cascade = {CascadeType.ALL}, orphanRemoval = true)
     private ImageData image;
 
+    @Column
+    private Boolean virtualUser;
+
+    public Boolean getVirtualUser() {
+        return virtualUser;
+    }
+
+    public boolean isVirtualUser() {
+        return virtualUser != null && virtualUser;
+    }
+
+    public void setVirtualUser(Boolean virtualUser) {
+        this.virtualUser = virtualUser;
+    }
+
+    public Date getModifyDate() {
+        return modifyDate;
+    }
+
+    public void setModifyDate(Date modifyDate) {
+        this.modifyDate = modifyDate;
+    }
+
     public Date getCreateDate() {
         return createDate;
     }

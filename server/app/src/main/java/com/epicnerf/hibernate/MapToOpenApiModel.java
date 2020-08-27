@@ -27,6 +27,7 @@ public class MapToOpenApiModel {
         u.setId(user.getId());
         u.setName(user.getName());
         u.setImage(map(user.getImage()));
+        u.setIsVirtual(user.isVirtualUser());
         return u;
     }
 

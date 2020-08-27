@@ -10,10 +10,8 @@ import com.epicnerf.hibernate.model.User;
 import com.epicnerf.hibernate.repository.FinanceRepository;
 import com.epicnerf.hibernate.repository.GroupInviteRepository;
 import com.epicnerf.hibernate.repository.GroupObjectRepository;
-import com.epicnerf.model.FinanceEntry;
-import com.epicnerf.model.FinanceEntryEntry;
-import com.epicnerf.model.Group;
-import com.epicnerf.model.Invite;
+import com.epicnerf.hibernate.repository.UserRepository;
+import com.epicnerf.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -61,6 +60,9 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
 
     @Autowired
     private MapToOpenApiModel openApiMapper;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public ResponseEntity<List<Group>> groupGet(Integer num, Integer lastId) {
         User user = apiSupport.getCurrentUser();
@@ -108,6 +110,25 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
             financeRepository.save(f);
 
             return ResponseEntity.ok(openApiMapper.map(f));
+        }
+        throw new NoResultException();
+    }
+
+    public ResponseEntity<Void> groupGroupIdAddVirtualUserPost(Integer groupId, AddVirtualUserData addVirtualUserData) {
+        User user = apiSupport.getCurrentUser();
+        Optional<GroupObject> group = groupObjectRepository.findById(groupId);
+        if (group.isPresent() && group.get().getOwner().getId().equals(user.getId())) {
+            User newUser = new User();
+            newUser.setEmail(UUID.randomUUID().toString());
+            newUser.setName(addVirtualUserData.getName());
+            newUser.setImage(apiSupport.defaultUserImage());
+            newUser.setVirtualUser(true);
+            userRepository.save(newUser);
+
+            group.get().getUsers().add(newUser);
+            groupObjectRepository.save(group.get());
+
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         throw new NoResultException();
     }

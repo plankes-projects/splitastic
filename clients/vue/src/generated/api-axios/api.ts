@@ -20,6 +20,19 @@ import globalAxios, { AxiosPromise, AxiosInstance } from 'axios';
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from './base';
 
 /**
+ * Data for the add virtual user call.
+ * @export
+ * @interface AddVirtualUserData
+ */
+export interface AddVirtualUserData {
+    /**
+     * The name of the virtual user.
+     * @type {string}
+     * @memberof AddVirtualUserData
+     */
+    name?: string;
+}
+/**
  * All information of the chore.
  * @export
  * @interface Chore
@@ -317,6 +330,12 @@ export interface User {
      * @memberof User
      */
     name?: string;
+    /**
+     * Defines if this user is virtual or not.
+     * @type {boolean}
+     * @memberof User
+     */
+    isVirtual?: boolean;
     /**
      * 
      * @type {ImageData}
@@ -2005,6 +2024,59 @@ export const GroupApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * 
+         * @summary Creates a new group.
+         * @param {number} groupId The id of the group.
+         * @param {AddVirtualUserData} addVirtualUserData 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupGroupIdAddVirtualUserPost: async (groupId: number, addVirtualUserData: AddVirtualUserData, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'groupId' is not null or undefined
+            if (groupId === null || groupId === undefined) {
+                throw new RequiredError('groupId','Required parameter groupId was null or undefined when calling groupGroupIdAddVirtualUserPost.');
+            }
+            // verify required parameter 'addVirtualUserData' is not null or undefined
+            if (addVirtualUserData === null || addVirtualUserData === undefined) {
+                throw new RequiredError('addVirtualUserData','Required parameter addVirtualUserData was null or undefined when calling groupGroupIdAddVirtualUserPost.');
+            }
+            const localVarPath = `/group/{groupId}/addVirtualUser`
+                .replace(`{${"groupId"}}`, encodeURIComponent(String(groupId)));
+            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuthHeader required
+            if (configuration && configuration.apiKey) {
+                const localVarApiKeyValue = typeof configuration.apiKey === 'function'
+                    ? await configuration.apiKey("X-API-KEY")
+                    : await configuration.apiKey;
+                localVarHeaderParameter["X-API-KEY"] = localVarApiKeyValue;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            localVarUrlObj.query = {...localVarUrlObj.query, ...localVarQueryParameter, ...options.query};
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            const headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof addVirtualUserData !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(addVirtualUserData !== undefined ? addVirtualUserData : {}) : (addVirtualUserData || "");
+
+            return {
+                url: globalImportUrl.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Removes the group.
          * @param {number} groupId The id of the group.
          * @param {*} [options] Override http request option.
@@ -2290,6 +2362,21 @@ export const GroupApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Creates a new group.
+         * @param {number} groupId The id of the group.
+         * @param {AddVirtualUserData} addVirtualUserData 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async groupGroupIdAddVirtualUserPost(groupId: number, addVirtualUserData: AddVirtualUserData, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await GroupApiAxiosParamCreator(configuration).groupGroupIdAddVirtualUserPost(groupId, addVirtualUserData, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary Removes the group.
          * @param {number} groupId The id of the group.
          * @param {*} [options] Override http request option.
@@ -2393,6 +2480,17 @@ export const GroupApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * 
+         * @summary Creates a new group.
+         * @param {number} groupId The id of the group.
+         * @param {AddVirtualUserData} addVirtualUserData 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupGroupIdAddVirtualUserPost(groupId: number, addVirtualUserData: AddVirtualUserData, options?: any): AxiosPromise<void> {
+            return GroupApiFp(configuration).groupGroupIdAddVirtualUserPost(groupId, addVirtualUserData, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Removes the group.
          * @param {number} groupId The id of the group.
          * @param {*} [options] Override http request option.
@@ -2471,6 +2569,19 @@ export class GroupApi extends BaseAPI {
      */
     public groupGet(num: number, lastId?: number, options?: any) {
         return GroupApiFp(this.configuration).groupGet(num, lastId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Creates a new group.
+     * @param {number} groupId The id of the group.
+     * @param {AddVirtualUserData} addVirtualUserData 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GroupApi
+     */
+    public groupGroupIdAddVirtualUserPost(groupId: number, addVirtualUserData: AddVirtualUserData, options?: any) {
+        return GroupApiFp(this.configuration).groupGroupIdAddVirtualUserPost(groupId, addVirtualUserData, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -2775,7 +2886,7 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * 
-         * @summary Modifies current user information.
+         * @summary Modifies the user information of this user if permitted.
          * @param {User} user 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2939,7 +3050,7 @@ export const UserApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Modifies current user information.
+         * @summary Modifies the user information of this user if permitted.
          * @param {User} user 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3025,7 +3136,7 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
         },
         /**
          * 
-         * @summary Modifies current user information.
+         * @summary Modifies the user information of this user if permitted.
          * @param {User} user 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3114,7 +3225,7 @@ export class UserApi extends BaseAPI {
 
     /**
      * 
-     * @summary Modifies current user information.
+     * @summary Modifies the user information of this user if permitted.
      * @param {User} user 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
