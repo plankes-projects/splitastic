@@ -117,7 +117,7 @@ export default class FinanceCard extends Vue {
     if ((this.finance.title ?? "").length > 0) {
       this.financeTitle = this.finance.title!;
     }
-    this.hasProxyInsertIcon = this.finance.spentFrom != this.myUserId;
+    this.hasProxyInsertIcon = this.finance.createdBy != this.finance.spentFrom;
   }
 }
 </script>
