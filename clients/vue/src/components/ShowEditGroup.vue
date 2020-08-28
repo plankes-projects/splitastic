@@ -160,7 +160,7 @@ export default class ShowEditGroup extends Vue {
   private isAddImaginaryFriendModalActive = false;
   private isEditImaginaryFriendModalActive = false;
 
-  private virtualUserToEdit!: User;
+  private virtualUserToEdit: User | null = null;
 
   private editVirtualUser(user: User) {
     this.virtualUserToEdit = user;

@@ -91,15 +91,18 @@ export default class AddOrEditImaginaryFriend extends Vue {
       basePath: config.basePath,
       apiKey: localStorage.apiKey
     });
-    this.user!.name = this.userName;
+
+    const userToUpdate = Object.assign({}, this.user!);
+    userToUpdate.name = this.userName;
+
     if (this.newProfileImage) {
-      this.user!.image = {
+      userToUpdate.image = {
         url: await FileUtils.loadToDataURL(this.newProfileImage)
       };
     } else {
-      this.user!.image = undefined;
+      userToUpdate.image = undefined;
     }
-    await api.userPut(this.user!);
+    await api.userPut(userToUpdate);
   }
 
   private async mounted() {
