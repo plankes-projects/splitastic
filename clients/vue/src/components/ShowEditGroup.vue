@@ -79,7 +79,7 @@
           </a>
         </div>
       </div>
-      <div class="addImaginaryFriendButtonContainer">
+      <div v-if="!readOnly" class="addImaginaryFriendButtonContainer">
         <b-button
           type="is-success"
           icon-left="plus"
@@ -160,7 +160,7 @@ export default class ShowEditGroup extends Vue {
   private isAddImaginaryFriendModalActive = false;
   private isEditImaginaryFriendModalActive = false;
 
-  private virtualUserToEdit!: User;
+  private virtualUserToEdit: User | null = null;
 
   private editVirtualUser(user: User) {
     this.virtualUserToEdit = user;
