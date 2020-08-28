@@ -79,7 +79,7 @@
           </a>
         </div>
       </div>
-      <div class="addImaginaryFriendButtonContainer">
+      <div v-if="!readOnly" class="addImaginaryFriendButtonContainer">
         <b-button
           type="is-success"
           icon-left="plus"
