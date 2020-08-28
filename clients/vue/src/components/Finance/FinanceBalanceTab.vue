@@ -12,7 +12,7 @@
         <div>
           <strong :class="balanceColorClass(userAndBalace.balance)">
             <template v-if="userAndBalace.balance > 0">+</template>
-            <template>{{formatBalance(userAndBalace.balance)}}</template>
+            <template>{{formatBalance(userAndBalace.balance)}}€</template>
           </strong>
         </div>
         <img class="userImage" :src="userAndBalace.user.image.url" alt="Image" />
