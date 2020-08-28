@@ -95,12 +95,7 @@ export default class FinanceCardList extends Vue {
   }
 
   private async mounted() {
-    window.addEventListener("scroll", this.onScroll);
     this.showLoadMoreButton = this.finances.length == this.numOfFinancesToLoad;
-  }
-
-  private async beforeDestroy() {
-    window.removeEventListener("scroll", this.onScroll);
   }
 }
 </script>
