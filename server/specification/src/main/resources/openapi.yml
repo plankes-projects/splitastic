@@ -208,6 +208,28 @@ paths:
         '204':
           description: Resource not found.
 
+  /group/{groupId}/balance:
+    get:
+      tags:
+        - "Group"
+      summary: Returns the data for the balance tab.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+      responses:
+        '200':
+          description: Successful call
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/groupBalanceData'
+        '204':
+          description: Resource not found.
+
   /group/{groupId}/addVirtualUser:
     post:
       tags:
@@ -699,6 +721,10 @@ components:
         balance:
           type: number
           description: the current balance of the user.
+        totalExpenses:
+          type: number
+          nullable: false
+          description: Total spent value of the group.
         image:
           $ref: '#/components/schemas/imageData'
         users:
@@ -753,6 +779,28 @@ components:
           type: integer
           nullable: false
           example: 6
+
+    groupBalanceData:
+      description: All data needed for the balance tab.
+      type: object
+      properties:
+        userBalances:
+          type: array
+          items:
+            $ref: '#/components/schemas/groupBalanceDataEntry'
+
+    groupBalanceDataEntry:
+      description: An entry in the group balance data array.
+      type: object
+      properties:
+        userId:
+          type: integer
+          nullable: false
+          example: 5
+        balance:
+          type: number
+          nullable: false
+          example: 100
 
     financeEntry:
       description: All information of this finance entry.

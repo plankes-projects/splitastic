@@ -66,7 +66,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
 
     public ResponseEntity<List<Group>> groupGet(Integer num, Integer lastId) {
         User user = apiSupport.getCurrentUser();
-        List<Group> result = openApiMapper.map(groupObjectDao.paginateGroups(user, num, lastId));
+        List<Group> result = openApiMapper.map(groupObjectDao.paginateGroups(user, num, lastId), user);
         result.forEach(e -> e.setBalance(BigDecimal.valueOf(financeEntryDao.getBalance(e.getId(), user.getId()))));
         return ResponseEntity.ok(result);
     }
@@ -133,11 +133,30 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
         throw new NoResultException();
     }
 
+    public ResponseEntity<GroupBalanceData> groupGroupIdBalanceGet(Integer groupId) {
+        User user = apiSupport.getCurrentUser();
+        Optional<GroupObject> group = groupObjectRepository.findById(groupId);
+        if (group.isPresent()) {
+            GroupBalanceData result = new GroupBalanceData();
+            apiSupport.validateUserIsInGroup(group.get(), user.getId());
+            for (User userInGroup : group.get().getUsers()) {
+                Double balance = financeEntryDao.getBalance(groupId, userInGroup.getId());
+                GroupBalanceDataEntry entry = new GroupBalanceDataEntry()
+                        .balance(BigDecimal.valueOf(balance))
+                        .userId(userInGroup.getId());
+                result.addUserBalancesItem(entry);
+            }
+
+            return ResponseEntity.ok(result);
+        }
+
+        throw new NoResultException();
+    }
+
     public ResponseEntity<Group> groupGroupIdGet(Integer groupId) {
         User user = apiSupport.getCurrentUser();
         GroupObject o = groupObjectDao.getViewableGroup(user, groupId);
-        Group g = openApiMapper.map(o);
-        g.setBalance(BigDecimal.valueOf(financeEntryDao.getBalance(o.getId(), user.getId())));
+        Group g = openApiMapper.map(o, user);
         return ResponseEntity.ok(g);
     }
 
@@ -238,7 +257,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
         Optional<GroupObject> i = groupObjectRepository.findById(groupId);
         if (i.isPresent() && i.get().getOwner().getId().equals(user.getId())) {
             List<GroupInvite> invites = groupInviteDao.getGroupInvites(i.get());
-            return ResponseEntity.ok(openApiMapper.mapInvites(invites));
+            return ResponseEntity.ok(openApiMapper.mapInvites(invites, user));
         }
         throw new NoResultException();
     }

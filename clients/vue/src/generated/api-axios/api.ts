@@ -212,6 +212,12 @@ export interface Group {
      */
     balance?: number;
     /**
+     * Total spent value of the group.
+     * @type {number}
+     * @memberof Group
+     */
+    totalExpenses?: number;
+    /**
      * 
      * @type {ImageData}
      * @memberof Group
@@ -223,6 +229,38 @@ export interface Group {
      * @memberof Group
      */
     users?: Array<User>;
+}
+/**
+ * All data needed for the balance tab.
+ * @export
+ * @interface GroupBalanceData
+ */
+export interface GroupBalanceData {
+    /**
+     * 
+     * @type {Array<GroupBalanceDataEntry>}
+     * @memberof GroupBalanceData
+     */
+    userBalances?: Array<GroupBalanceDataEntry>;
+}
+/**
+ * An entry in the group balance data array.
+ * @export
+ * @interface GroupBalanceDataEntry
+ */
+export interface GroupBalanceDataEntry {
+    /**
+     * 
+     * @type {number}
+     * @memberof GroupBalanceDataEntry
+     */
+    userId?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GroupBalanceDataEntry
+     */
+    balance?: number;
 }
 /**
  * Data on how to display an image.
@@ -2077,6 +2115,50 @@ export const GroupApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * 
+         * @summary Returns the data for the balance tab.
+         * @param {number} groupId The id of the group.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupGroupIdBalanceGet: async (groupId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'groupId' is not null or undefined
+            if (groupId === null || groupId === undefined) {
+                throw new RequiredError('groupId','Required parameter groupId was null or undefined when calling groupGroupIdBalanceGet.');
+            }
+            const localVarPath = `/group/{groupId}/balance`
+                .replace(`{${"groupId"}}`, encodeURIComponent(String(groupId)));
+            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuthHeader required
+            if (configuration && configuration.apiKey) {
+                const localVarApiKeyValue = typeof configuration.apiKey === 'function'
+                    ? await configuration.apiKey("X-API-KEY")
+                    : await configuration.apiKey;
+                localVarHeaderParameter["X-API-KEY"] = localVarApiKeyValue;
+            }
+
+
+    
+            localVarUrlObj.query = {...localVarUrlObj.query, ...localVarQueryParameter, ...options.query};
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            const headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: globalImportUrl.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Removes the group.
          * @param {number} groupId The id of the group.
          * @param {*} [options] Override http request option.
@@ -2377,6 +2459,20 @@ export const GroupApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Returns the data for the balance tab.
+         * @param {number} groupId The id of the group.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async groupGroupIdBalanceGet(groupId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GroupBalanceData>> {
+            const localVarAxiosArgs = await GroupApiAxiosParamCreator(configuration).groupGroupIdBalanceGet(groupId, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary Removes the group.
          * @param {number} groupId The id of the group.
          * @param {*} [options] Override http request option.
@@ -2491,6 +2587,16 @@ export const GroupApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * 
+         * @summary Returns the data for the balance tab.
+         * @param {number} groupId The id of the group.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupGroupIdBalanceGet(groupId: number, options?: any): AxiosPromise<GroupBalanceData> {
+            return GroupApiFp(configuration).groupGroupIdBalanceGet(groupId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Removes the group.
          * @param {number} groupId The id of the group.
          * @param {*} [options] Override http request option.
@@ -2582,6 +2688,18 @@ export class GroupApi extends BaseAPI {
      */
     public groupGroupIdAddVirtualUserPost(groupId: number, addVirtualUserData: AddVirtualUserData, options?: any) {
         return GroupApiFp(this.configuration).groupGroupIdAddVirtualUserPost(groupId, addVirtualUserData, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Returns the data for the balance tab.
+     * @param {number} groupId The id of the group.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GroupApi
+     */
+    public groupGroupIdBalanceGet(groupId: number, options?: any) {
+        return GroupApiFp(this.configuration).groupGroupIdBalanceGet(groupId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

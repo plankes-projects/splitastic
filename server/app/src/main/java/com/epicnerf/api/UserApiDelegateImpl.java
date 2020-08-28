@@ -62,7 +62,7 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     public ResponseEntity<List<Invite>> userInviteGet() {
         com.epicnerf.hibernate.model.User user = apiSupport.getCurrentUser();
         List<GroupInvite> invites = groupInviteDao.getGroupInvites(user);
-        return ResponseEntity.ok(openApiMapper.mapInvites(invites));
+        return ResponseEntity.ok(openApiMapper.mapInvites(invites, user));
     }
 
     public ResponseEntity<Void> userResetApiKeyPut() {

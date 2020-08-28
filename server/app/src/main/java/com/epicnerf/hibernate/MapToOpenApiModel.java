@@ -1,8 +1,10 @@
 package com.epicnerf.hibernate;
 
+import com.epicnerf.hibernate.dao.FinanceEntryDao;
 import com.epicnerf.hibernate.model.GroupInvite;
 import com.epicnerf.hibernate.model.GroupObject;
 import com.epicnerf.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -14,6 +16,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class MapToOpenApiModel {
+
+    @Autowired
+    private FinanceEntryDao financeEntryDao;
 
     public List<User> mapUsers(List<com.epicnerf.hibernate.model.User> users) {
         return users.stream()
@@ -37,13 +42,13 @@ public class MapToOpenApiModel {
         return i;
     }
 
-    public List<Group> map(List<GroupObject> groups) {
+    public List<Group> map(List<GroupObject> groups, com.epicnerf.hibernate.model.User currentUser) {
         return groups.stream()
-                .map(this::map)
+                .map(group -> map(group, currentUser))
                 .collect(Collectors.toList());
     }
 
-    public Group map(GroupObject group) {
+    public Group map(GroupObject group, com.epicnerf.hibernate.model.User currentUser) {
         Group g = new Group();
         g.setOwner(group.getOwner().getId());
         g.setName(group.getName());
@@ -51,13 +56,15 @@ public class MapToOpenApiModel {
         g.setId(group.getId());
         g.setImage(map(group.getImage()));
         g.setUsers(mapUsers(group.getUsers()));
+        g.setBalance(BigDecimal.valueOf(financeEntryDao.getBalance(group.getId(), currentUser.getId())));
+        g.setTotalExpenses(BigDecimal.valueOf(financeEntryDao.getTotalExpenses(group.getId())));
         return g;
     }
 
-    public Invite map(GroupInvite invite) {
+    public Invite map(GroupInvite invite, com.epicnerf.hibernate.model.User currentUser) {
         Invite i = new Invite();
         i.setEmail(invite.getInvitedUser().getEmail());
-        i.setGroup(map(invite.getGroup()));
+        i.setGroup(map(invite.getGroup(), currentUser));
         i.setId(invite.getId());
         return i;
     }
@@ -72,9 +79,9 @@ public class MapToOpenApiModel {
         return c;
     }
 
-    public List<Invite> mapInvites(List<com.epicnerf.hibernate.model.GroupInvite> invites) {
+    public List<Invite> mapInvites(List<com.epicnerf.hibernate.model.GroupInvite> invites, com.epicnerf.hibernate.model.User currentUser) {
         return invites.stream()
-                .map(this::map)
+                .map(invite -> map(invite, currentUser))
                 .collect(Collectors.toList());
     }
 
