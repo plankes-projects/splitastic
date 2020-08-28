@@ -2,7 +2,7 @@
 
 Splitastic is an open source self hosted chores/expenses splitting app.
 
-The app can be used to track expenses and chores of multiple groups. In a household or vecation. It is actively used and improved by the repository owner.
+The app can be used to track expenses and chores of multiple groups. In a household or vacation. It is actively used and improved by the repository owner.
 
 Mobile phones are first class citizens in this app. This means you should use this app on a mobile phone for the best experience.
 
@@ -30,5 +30,7 @@ MAJOR.MINOR.PATCH - Each of the parts is incremented according to:
 * MINOR, when new functionality is added in a backwards-compatible manner
 * PATCH, when bug fixes are made in a backward-compatible manner
  
-## Donate
-https://epicnerf.com/donate/
+## Contribute
+2 ways to contribute:
+* Coding: https://github.com/plankes-projects/splitastic/wiki/Quick-start-guide-for-development
+* Donate: https://epicnerf.com/donate/

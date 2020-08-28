@@ -59,7 +59,22 @@ public class FinanceEntryDao {
                 .getResultList();
     }
 
-    public float getBalance(int groupId, int userId) {
+    public Double getTotalExpenses(int groupId) {
+        String query = "SELECT sum(amount) FROM finance_entry_entry\n" +
+                "join finance_entry_entries on finance_entry_entries.entries_id = finance_entry_entry.id\n" +
+                "join finance_entry on finance_entry_entries.finance_entry_id = finance_entry.id\n" +
+                "where group_id = :groupId ";
+        Double get = (Double) entityManager
+                .createNativeQuery(query)
+                .setParameter("groupId", groupId)
+                .getSingleResult();
+        if (get == null) {
+            get = 0.0;
+        }
+        return get;
+    }
+
+    public Double getBalance(int groupId, int userId) {
         String baseQuery = "SELECT sum(amount) FROM finance_entry_entry\n" +
                 "join finance_entry_entries on finance_entry_entries.entries_id = finance_entry_entry.id\n" +
                 "join finance_entry on finance_entry_entries.finance_entry_id = finance_entry.id\n" +
@@ -84,7 +99,7 @@ public class FinanceEntryDao {
         if (owe == null) {
             owe = 0.0;
         }
-        return (float) (get - owe);
+        return get - owe;
     }
 
     public List<String> getSuggestions(int groupId, int userId) {

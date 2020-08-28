@@ -17,8 +17,30 @@
             <b-input v-model="amount" placeholder="Number" type="number" readonly></b-input>
           </b-field>
 
+          <div v-if="createdByUser">
+            <p class="forLabel">
+              <b-icon class="proxyInsertIcon" icon="hands-helping" size="is-small"></b-icon>
+              <b>Inserted by:</b>
+            </p>
+            <b-checkbox-button type="is-success" class="block userButton" disabled="disabled">
+              <div class="name">{{ createdByUser.name }}</div>
+            </b-checkbox-button>
+            <figure class="image imageContainer">
+              <img class="myImage" :src="createdByUser.image.url" alt="Image" />
+            </figure>
+          </div>
           <p class="forLabel">
-            <b>For</b>
+            <b>Paid by:</b>
+          </p>
+          <b-checkbox-button type="is-success" class="block userButton" disabled="disabled">
+            <div class="name">{{ fromUser.name }}</div>
+          </b-checkbox-button>
+          <figure class="image imageContainer">
+            <img class="myImage" :src="fromUser.image.url" alt="Image" />
+          </figure>
+
+          <p class="forLabel">
+            <b>Bought for:</b>
           </p>
           <div v-for="user in group.users" :key="user.id">
             <b-checkbox-button
@@ -28,7 +50,7 @@
               class="block userButton"
               disabled="disabled"
             >
-              <div>{{user.name}}</div>
+              <div class="name">{{user.name}}</div>
             </b-checkbox-button>
             <figure class="image imageContainer">
               <img class="myImage" :src="user.image.url" alt="Image" />
@@ -36,7 +58,7 @@
           </div>
 
           <b-button
-            v-if="isOwner()"
+            v-if="canDelete()"
             @click="deleteClicked()"
             class="deleteButton"
             type="is-danger"
@@ -56,7 +78,8 @@ import {
   GroupApi,
   Group,
   FinanceApi,
-  FinanceEntry
+  FinanceEntry,
+  User
 } from "@/generated/api-axios";
 import config from "@/../config";
 
@@ -70,9 +93,22 @@ export default class ViewFinance extends Vue {
   private finance!: FinanceEntry;
   private amount = 0;
   private financeId!: number;
+  private fromUser!: User;
+  private createdByUser: User | null = null;
 
-  private isOwner() {
-    return localStorage.userId == this.finance.spentFrom;
+  private canDelete() {
+    return (
+      localStorage.userId == this.finance.spentFrom ||
+      (this.group.owner == localStorage.userId && this.isVirtualEntry())
+    );
+  }
+
+  private isVirtualEntry() {
+    for (const user of this.group.users!) {
+      if (user.id == this.finance.spentFrom) {
+        return user.isVirtual;
+      }
+    }
   }
 
   private backClicked() {
@@ -133,6 +169,20 @@ export default class ViewFinance extends Vue {
       this.userIdsForSpent.push(spent.spentFor!);
       this.amount += spent.amount!;
     }
+
+    const users = this.group.users!;
+    for (const user of users) {
+      if (user.id == this.finance.spentFrom) {
+        this.fromUser = user;
+      }
+      if (
+        this.finance.spentFrom != this.finance.createdBy &&
+        user.id == this.finance.createdBy
+      ) {
+        this.createdByUser = user;
+      }
+    }
+
     this.amount = Number(this.amount.toFixed(2));
     this.loading = false;
   }
@@ -193,5 +243,15 @@ export default class ViewFinance extends Vue {
   background-color: $transbarentBackground;
   padding: $formDataPadding;
   margin: 1em;
+}
+
+.name {
+  width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.proxyInsertIcon {
+  padding-right: 1em;
 }
 </style>

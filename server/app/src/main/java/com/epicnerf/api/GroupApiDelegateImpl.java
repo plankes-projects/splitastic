@@ -10,10 +10,8 @@ import com.epicnerf.hibernate.model.User;
 import com.epicnerf.hibernate.repository.FinanceRepository;
 import com.epicnerf.hibernate.repository.GroupInviteRepository;
 import com.epicnerf.hibernate.repository.GroupObjectRepository;
-import com.epicnerf.model.FinanceEntry;
-import com.epicnerf.model.FinanceEntryEntry;
-import com.epicnerf.model.Group;
-import com.epicnerf.model.Invite;
+import com.epicnerf.hibernate.repository.UserRepository;
+import com.epicnerf.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -62,9 +61,12 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
     @Autowired
     private MapToOpenApiModel openApiMapper;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public ResponseEntity<List<Group>> groupGet(Integer num, Integer lastId) {
         User user = apiSupport.getCurrentUser();
-        List<Group> result = openApiMapper.map(groupObjectDao.paginateGroups(user, num, lastId));
+        List<Group> result = openApiMapper.map(groupObjectDao.paginateGroups(user, num, lastId), user);
         result.forEach(e -> e.setBalance(BigDecimal.valueOf(financeEntryDao.getBalance(e.getId(), user.getId()))));
         return ResponseEntity.ok(result);
     }
@@ -94,6 +96,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
     }
 
     public ResponseEntity<FinanceEntry> groupGroupIdFinancePost(Integer groupId, FinanceEntry financeEntry) {
+        User user = apiSupport.getCurrentUser();
         Optional<GroupObject> group = groupObjectRepository.findById(groupId);
         if (group.isPresent()) {
             apiSupport.validateUserIsInGroup(group.get(), financeEntry.getSpentFrom());
@@ -102,6 +105,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
             }
 
             com.epicnerf.hibernate.model.FinanceEntry f = mapper.mapFinance(financeEntry, false);
+            f.setCreatedBy(user);
             f.setGroup(group.get());
             financeRepository.save(f);
 
@@ -110,11 +114,49 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
         throw new NoResultException();
     }
 
+    public ResponseEntity<Void> groupGroupIdAddVirtualUserPost(Integer groupId, AddVirtualUserData addVirtualUserData) {
+        User user = apiSupport.getCurrentUser();
+        Optional<GroupObject> group = groupObjectRepository.findById(groupId);
+        if (group.isPresent() && group.get().getOwner().getId().equals(user.getId())) {
+            User newUser = new User();
+            newUser.setEmail(UUID.randomUUID().toString());
+            newUser.setName(addVirtualUserData.getName());
+            newUser.setImage(apiSupport.defaultUserImage());
+            newUser.setVirtualUser(true);
+            userRepository.save(newUser);
+
+            group.get().getUsers().add(newUser);
+            groupObjectRepository.save(group.get());
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        throw new NoResultException();
+    }
+
+    public ResponseEntity<GroupBalanceData> groupGroupIdBalanceGet(Integer groupId) {
+        User user = apiSupport.getCurrentUser();
+        Optional<GroupObject> group = groupObjectRepository.findById(groupId);
+        if (group.isPresent()) {
+            GroupBalanceData result = new GroupBalanceData();
+            apiSupport.validateUserIsInGroup(group.get(), user.getId());
+            for (User userInGroup : group.get().getUsers()) {
+                Double balance = financeEntryDao.getBalance(groupId, userInGroup.getId());
+                GroupBalanceDataEntry entry = new GroupBalanceDataEntry()
+                        .balance(BigDecimal.valueOf(balance))
+                        .userId(userInGroup.getId());
+                result.addUserBalancesItem(entry);
+            }
+
+            return ResponseEntity.ok(result);
+        }
+
+        throw new NoResultException();
+    }
+
     public ResponseEntity<Group> groupGroupIdGet(Integer groupId) {
         User user = apiSupport.getCurrentUser();
         GroupObject o = groupObjectDao.getViewableGroup(user, groupId);
-        Group g = openApiMapper.map(o);
-        g.setBalance(BigDecimal.valueOf(financeEntryDao.getBalance(o.getId(), user.getId())));
+        Group g = openApiMapper.map(o, user);
         return ResponseEntity.ok(g);
     }
 
@@ -215,7 +257,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
         Optional<GroupObject> i = groupObjectRepository.findById(groupId);
         if (i.isPresent() && i.get().getOwner().getId().equals(user.getId())) {
             List<GroupInvite> invites = groupInviteDao.getGroupInvites(i.get());
-            return ResponseEntity.ok(openApiMapper.mapInvites(invites));
+            return ResponseEntity.ok(openApiMapper.mapInvites(invites, user));
         }
         throw new NoResultException();
     }

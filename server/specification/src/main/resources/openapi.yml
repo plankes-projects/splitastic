@@ -208,6 +208,50 @@ paths:
         '204':
           description: Resource not found.
 
+  /group/{groupId}/balance:
+    get:
+      tags:
+        - "Group"
+      summary: Returns the data for the balance tab.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+      responses:
+        '200':
+          description: Successful call
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/groupBalanceData'
+        '204':
+          description: Resource not found.
+
+  /group/{groupId}/addVirtualUser:
+    post:
+      tags:
+        - "Group"
+      summary:  Creates a new group.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/addVirtualUserData'
+      responses:
+        '200':    # status code
+          description: Successfully added the user.
+
   /user:
     get:
       tags:
@@ -223,7 +267,7 @@ paths:
     put:
       tags:
         - "User"
-      summary:  Modifies current user information.
+      summary:  Modifies the user information of this user if permitted.
       requestBody:
         required: true
         content:
@@ -677,6 +721,10 @@ components:
         balance:
           type: number
           description: the current balance of the user.
+        totalExpenses:
+          type: number
+          nullable: false
+          description: Total spent value of the group.
         image:
           $ref: '#/components/schemas/imageData'
         users:
@@ -732,6 +780,28 @@ components:
           nullable: false
           example: 6
 
+    groupBalanceData:
+      description: All data needed for the balance tab.
+      type: object
+      properties:
+        userBalances:
+          type: array
+          items:
+            $ref: '#/components/schemas/groupBalanceDataEntry'
+
+    groupBalanceDataEntry:
+      description: An entry in the group balance data array.
+      type: object
+      properties:
+        userId:
+          type: integer
+          nullable: false
+          example: 5
+        balance:
+          type: number
+          nullable: false
+          example: 100
+
     financeEntry:
       description: All information of this finance entry.
       type: object
@@ -751,6 +821,10 @@ components:
           example: 6
           nullable: false
           description: The user id of the spender.
+        createdBy:
+          type: integer
+          example: 6
+          description: The user id of the user who inserted this entry.
         spent:
           type: array
           items:
@@ -772,6 +846,16 @@ components:
           example: 10.5
           nullable: false
           description: The amount of money spent.
+
+    addVirtualUserData:
+      description: Data for the add virtual user call.
+      type: object
+      properties:
+        name:
+          type: string
+          example: Anton
+          nullable: false
+          description: The name of the virtual user.
 
     loginData:
       description: All information needed for the login.
@@ -817,6 +901,10 @@ components:
           type: string
           example: Max Mustermann
           description: Name of the user
+        isVirtual:
+          type: boolean
+          example: false
+          description: Defines if this user is virtual or not.
         image:
           $ref: '#/components/schemas/imageData'
 

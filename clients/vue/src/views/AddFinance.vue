@@ -26,10 +26,24 @@
               <b-input v-model="amount" placeholder="Amount" type="number" step="0.01" min="0.01"></b-input>
             </b-field>
 
-            <b-button size="is-large" @click="add">Add</b-button>
+            <b-button class="addButton" size="is-large" @click="add">Add</b-button>
 
             <p class="forLabel">
-              <b>For</b>
+              <b>Who Paid?</b>
+            </p>
+            <b-checkbox-button
+              type="is-success"
+              class="block userButton"
+              @click.native="whoPaidClicked"
+            >
+              <div class="name">{{ fromUser.name }}</div>
+            </b-checkbox-button>
+            <figure class="image imageContainer">
+              <img class="myImage" :src="fromUser.image.url" alt="Image" />
+            </figure>
+
+            <p class="forLabel">
+              <b>Bought for?</b>
             </p>
             <div v-for="user in group.users" :key="user.id">
               <b-checkbox-button
@@ -38,7 +52,7 @@
                 type="is-success"
                 class="block userButton"
               >
-                <div>{{ user.name }}</div>
+                <div class="name">{{ user.name }}</div>
               </b-checkbox-button>
               <figure class="image imageContainer">
                 <img class="myImage" :src="user.image.url" alt="Image" />
@@ -47,6 +61,24 @@
           </div>
         </section>
       </div>
+      <b-modal :active.sync="isFromChooserModalActive">
+        <section class="section">
+          <div class="section fromchooserContainer">
+            <div v-for="user in group.users" :key="user.id">
+              <b-checkbox-button
+                type="is-success"
+                class="block userButton"
+                @click.native="whoPaidChangedClicked(user, $event)"
+              >
+                <div class="name">{{ user.name }}</div>
+              </b-checkbox-button>
+              <figure class="image imageContainer">
+                <img class="myImage" :src="user.image.url" alt="Image" />
+              </figure>
+            </div>
+          </div>
+        </section>
+      </b-modal>
     </template>
   </div>
 </template>
@@ -59,7 +91,8 @@ import {
   Group,
   FinanceApi,
   FinanceEntry,
-  FinanceEntryEntry
+  FinanceEntryEntry,
+  User
 } from "@/generated/api-axios";
 import config from "@/../config";
 
@@ -69,11 +102,15 @@ export default class AddFinance extends Vue {
   private loading = true;
   private userIdsForSpent: number[] = [];
 
+  private isFromChooserModalActive = false;
+
   private group!: Group;
   private title = "";
-  private amount!: number;
+  private amount: number | null = null;
   private titleSuggestions: string[] = [];
   private titlePlaceholder = "e.g. grocery";
+
+  private fromUser!: User;
 
   get filteredTitleArray() {
     return this.titleSuggestions.filter(option => {
@@ -90,6 +127,16 @@ export default class AddFinance extends Vue {
     this.$router.push({ name: RouterNames.FINANCE });
   }
 
+  private async whoPaidClicked(e: Event) {
+    e.preventDefault();
+    this.isFromChooserModalActive = true;
+  }
+  private async whoPaidChangedClicked(user: User, e: Event) {
+    e.preventDefault();
+    this.fromUser = user;
+    this.isFromChooserModalActive = false;
+  }
+
   private async add() {
     if (this.userIdsForSpent.length == 0) {
       this.$buefy.toast.open({
@@ -100,10 +147,28 @@ export default class AddFinance extends Vue {
       return;
     }
 
+    if (!this.title) {
+      this.$buefy.toast.open({
+        duration: 1000,
+        message: `Title missing`,
+        type: "is-danger"
+      });
+      return;
+    }
+
+    if (!this.amount) {
+      this.$buefy.toast.open({
+        duration: 1000,
+        message: `Amount missing`,
+        type: "is-danger"
+      });
+      return;
+    }
+
     const spentPerPerson = this.amount / this.userIdsForSpent.length;
 
     const finance: FinanceEntry = {};
-    finance.spentFrom = localStorage.userId;
+    finance.spentFrom = this.fromUser.id;
     finance.title = this.title;
     finance.spent = [];
 
@@ -154,6 +219,9 @@ export default class AddFinance extends Vue {
     const users = this.group.users!;
     for (const user of users) {
       this.userIdsForSpent.push(user.id!);
+      if (user.id == localStorage.userId) {
+        this.fromUser = user;
+      }
     }
 
     this.loading = false;
@@ -214,5 +282,21 @@ export default class AddFinance extends Vue {
   background-color: $transbarentBackground;
   padding: $formDataPadding;
   margin: 1em;
+}
+
+.fromchooserContainer {
+  background-color: $transbarentBackground;
+}
+
+.name {
+  width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fromUser {
+  display: inline-block;
+  width: 2em;
+  margin-right: 2em;
 }
 </style>

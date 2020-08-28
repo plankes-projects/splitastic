@@ -30,14 +30,26 @@ public class FinanceApiDelegateImpl implements FinanceApiDelegate {
     private MapToOpenApiModel openApiMapper;
 
     public ResponseEntity<Void> financeFinanceIdDelete(Integer financeId) {
-        User user = apiSupport.getCurrentUser();
         Optional<FinanceEntry> finance = financeRepository.findById(financeId);
 
-        if (finance.isPresent() && finance.get().getSpentFrom().getId().equals(user.getId())) {
+        if (finance.isPresent() && canDelete(finance.get())) {
             financeRepository.delete(finance.get());
             return new ResponseEntity<>(HttpStatus.OK);
         }
         throw new NoResultException();
+    }
+
+    private boolean canDelete(FinanceEntry financeEntry) {
+        User user = apiSupport.getCurrentUser();
+        if (financeEntry.getSpentFrom().getId().equals(user.getId())) {
+            return true;
+        }
+
+        if (financeEntry.getGroup().getOwner().getId().equals(user.getId()) && financeEntry.getSpentFrom().isVirtualUser()) {
+            return true;
+        }
+
+        return false;
     }
 
     public ResponseEntity<com.epicnerf.model.FinanceEntry> financeFinanceIdGet(Integer financeId) {

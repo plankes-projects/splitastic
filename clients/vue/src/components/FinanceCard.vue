@@ -12,10 +12,16 @@
           <img class="userImage" :src="getUserImage()" alt="Image" />
         </figure>
       </div>
+      <b-icon
+        v-if="hasProxyInsertIcon"
+        class="proxyInsertIcon"
+        icon="hands-helping"
+        size="is-small"
+      ></b-icon>
       <div class="media-content">
         <div class="myContent content">
           <p>
-            <strong>{{ this.finance.title }}</strong>
+            <strong>{{ this.financeTitle }}</strong>
           </p>
         </div>
         <div class="level is-mobile">
@@ -41,6 +47,9 @@ export default class FinanceCard extends Vue {
   @Prop() private finance!: FinanceEntry;
   @Prop() private myUserId!: number;
   @Prop() private group!: Group;
+
+  private financeTitle = "No Title";
+  private hasProxyInsertIcon = false;
 
   get balanceSignString(): string {
     return this.finance.spentFrom == this.myUserId ? "" : "-";
@@ -103,6 +112,13 @@ export default class FinanceCard extends Vue {
     }
     return undefined;
   }
+
+  private mounted() {
+    if ((this.finance.title ?? "").length > 0) {
+      this.financeTitle = this.finance.title!;
+    }
+    this.hasProxyInsertIcon = this.finance.spentFrom != this.myUserId;
+  }
 }
 </script>
 
@@ -162,5 +178,10 @@ export default class FinanceCard extends Vue {
 }
 .green {
   color: green;
+}
+
+.proxyInsertIcon {
+  position: absolute;
+  margin-top: 1.5em;
 }
 </style>

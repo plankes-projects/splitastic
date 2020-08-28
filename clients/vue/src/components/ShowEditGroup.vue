@@ -36,21 +36,26 @@
             <p class="userName">{{ user.name }}</p>
           </div>
 
-          <b-icon
-            v-if="isOwner(user.id)"
-            class="level-right level-item"
-            icon="crown"
-            size="is-small"
-            type="is-warning"
-          ></b-icon>
+          <div class="level-right">
+            <b-icon
+              v-if="isOwner(user.id)"
+              class="level-item"
+              icon="crown"
+              size="is-small"
+              type="is-warning"
+            ></b-icon>
 
-          <a
-            v-if="!isMyUserId(user.id) && !readOnly"
-            class="level-right level-item"
-            @click="deleteUserWithConfirm(user.id)"
-          >
-            <b-icon icon="trash" size="is-small" type="is-danger"></b-icon>
-          </a>
+            <a v-if="!readOnly && user.isVirtual" class="level-item" @click="editVirtualUser(user)">
+              <b-icon icon="edit" size="is-small"></b-icon>
+            </a>
+            <a
+              v-if="!isMyUserId(user.id) && !readOnly"
+              class="level-item"
+              @click="deleteUserWithConfirm(user.id)"
+            >
+              <b-icon icon="trash" size="is-small" type="is-danger"></b-icon>
+            </a>
+          </div>
         </div>
       </div>
 
@@ -74,7 +79,13 @@
           </a>
         </div>
       </div>
-
+      <div class="addImaginaryFriendButtonContainer">
+        <b-button
+          type="is-success"
+          icon-left="plus"
+          @click="addImaginaryFriend"
+        >Add Imaginary Friend</b-button>
+      </div>
       <b-button
         v-if="isMyUserId(group.owner) && !readOnly"
         type="is-danger"
@@ -88,7 +99,7 @@
         @click="leaveGroupWithConfirm(group.id)"
       >Leave Group</b-button>
 
-      <b-modal :active.sync="isInviteModalActive" :width="640" scroll="keep">
+      <b-modal :active.sync="isInviteModalActive" scroll="keep">
         <section class="section">
           <div class="card">
             <div class="card-content">
@@ -100,6 +111,21 @@
           </div>
         </section>
       </b-modal>
+
+      <b-modal :active.sync="isAddImaginaryFriendModalActive" scroll="keep">
+        <AddOrEditImaginaryFriend
+          :groupId="group.id"
+          :user="null"
+          @user-created="imaginaryFriendCreated"
+        />
+      </b-modal>
+      <b-modal :active.sync="isEditImaginaryFriendModalActive" scroll="keep">
+        <AddOrEditImaginaryFriend
+          :groupId="group.id"
+          :user="virtualUserToEdit"
+          @user-created="imaginaryFriendCreated"
+        />
+      </b-modal>
     </template>
   </div>
 </template>
@@ -107,13 +133,18 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { Group, GroupApi, Invite, UserApi } from "@/generated/api-axios";
+import { Group, GroupApi, Invite, UserApi, User } from "@/generated/api-axios";
 import config from "@/../config";
 import { RouterNames } from "@/untils/RouterNames";
 import { FileUtils } from "@/untils/FileUtils";
 import { StateUtils } from "@/untils/StateUtils";
+import AddOrEditImaginaryFriend from "@/components/AddOrEditImaginaryFriend.vue";
 
-@Component
+@Component({
+  components: {
+    AddOrEditImaginaryFriend
+  }
+})
 export default class ShowEditGroup extends Vue {
   @Prop()
   private readOnly!: boolean;
@@ -126,6 +157,22 @@ export default class ShowEditGroup extends Vue {
 
   private savingGroupDetails = false;
   private isInviteModalActive = false;
+  private isAddImaginaryFriendModalActive = false;
+  private isEditImaginaryFriendModalActive = false;
+
+  private virtualUserToEdit!: User;
+
+  private editVirtualUser(user: User) {
+    this.virtualUserToEdit = user;
+    this.isEditImaginaryFriendModalActive = true;
+  }
+
+  private imaginaryFriendCreated() {
+    this.isAddImaginaryFriendModalActive = false;
+    this.loading = true;
+    this.$router.go(0);
+  }
+
   private removeNewFile() {
     this.newProfileImage = null;
   }
@@ -136,6 +183,10 @@ export default class ShowEditGroup extends Vue {
 
   private isOwner(userId: number) {
     return this.group.owner == userId;
+  }
+
+  private async addImaginaryFriend() {
+    this.isAddImaginaryFriendModalActive = true;
   }
 
   private async leaveGroupWithConfirm() {
@@ -335,6 +386,10 @@ export default class ShowEditGroup extends Vue {
 #saveButton {
   margin-bottom: 1em;
 }
+
+.addImaginaryFriendButtonContainer {
+  margin-bottom: 1em;
+}
 #descField {
   margin-bottom: 0;
 }
@@ -345,6 +400,10 @@ export default class ShowEditGroup extends Vue {
 
 .userName {
   margin-left: 0.75em;
+  display: inline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .userNameContainer {

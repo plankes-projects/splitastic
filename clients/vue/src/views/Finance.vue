@@ -9,20 +9,26 @@
         <router-link :to="{ name: routeAddFinance, params: { groupId: group.id } }">
           <b-icon class="addButton" type="is-info" icon="plus-circle" size="is-large"></b-icon>
         </router-link>
-        <div v-for="finance in finances" :key="finance.id">
-          <a @click="viewDetails(finance.id)">
-            <FinanceCard
-              class="financeCard"
+
+        <b-tabs class="tabsContainer" v-model="activeTab" expanded>
+          <b-tab-item label="Entries">
+            <template slot="header">
+              <strong>Entries</strong>
+            </template>
+            <FinanceCardList
               :group="group"
-              :myUserId="myUserId"
-              :finance="finance"
+              :finances="finances"
+              :numOfFinancesToLoad="numOfFinancesToLoad"
             />
-          </a>
-        </div>
-      </div>
-      <div v-if="showLoadMoreButton" @click="loadMore()" class="showMoreButton">
-        <b-button v-if="loadingMore" loading>Load More</b-button>
-        <b-button v-else>Load More</b-button>
+          </b-tab-item>
+
+          <b-tab-item label="Balance">
+            <template slot="header">
+              <strong>Balance</strong>
+            </template>
+            <FinanceBalanceTab :group="group" :balanceData="balanceData" />
+          </b-tab-item>
+        </b-tabs>
       </div>
     </template>
   </div>
@@ -33,11 +39,14 @@ import { Component, Vue } from "vue-property-decorator";
 import { RouterNames } from "@/untils/RouterNames";
 import GroupCard from "@/components/GroupCard.vue";
 import FinanceCard from "@/components/FinanceCard.vue";
+import FinanceCardList from "@/components/Finance/FinanceCardList.vue";
+import FinanceBalanceTab from "@/components/Finance/FinanceBalanceTab.vue";
 import {
   GroupApi,
   Group,
   FinanceApi,
-  FinanceEntry
+  FinanceEntry,
+  GroupBalanceData
 } from "@/generated/api-axios";
 import config from "@/../config";
 import { StateUtils } from "@/untils/StateUtils";
@@ -45,7 +54,9 @@ import { StateUtils } from "@/untils/StateUtils";
 @Component({
   components: {
     FinanceCard,
-    GroupCard
+    GroupCard,
+    FinanceCardList,
+    FinanceBalanceTab
   }
 })
 export default class Finance extends Vue {
@@ -55,54 +66,9 @@ export default class Finance extends Vue {
   private loading = true;
   private group!: Group;
   private finances!: FinanceEntry[];
-  private myUserId = localStorage.userId;
-  private showLoadMoreButton = false;
-  private loadingMore = false;
+  private balanceData!: GroupBalanceData;
   private numOfFinancesToLoad = 10;
-
-  private balanceColorClass() {
-    return this.group.balance! < 0 ? "red" : "green";
-  }
-
-  get balance() {
-    return this.group.balance!.toFixed(2);
-  }
-
-  private viewDetails(financeId: number) {
-    this.$router.push({
-      name: RouterNames.VIEW_FINANCE,
-      params: {
-        groupId: this.group.id!.toString(),
-        financeId: financeId.toString()
-      }
-    });
-  }
-
-  private async loadMore() {
-    if (this.loadingMore || !this.showLoadMoreButton) {
-      return;
-    }
-    this.loadingMore = true;
-    const lastFinance = this.finances[this.finances.length - 1];
-    const api = new FinanceApi({
-      basePath: config.basePath,
-      apiKey: localStorage.apiKey
-    });
-
-    const newFinances = (
-      await api.groupGroupIdFinanceGet(
-        Number(this.$route.params.groupId),
-        this.numOfFinancesToLoad,
-        lastFinance.id
-      )
-    ).data;
-    for (const finance of newFinances) {
-      this.finances.push(finance);
-    }
-    this.showLoadMoreButton = newFinances.length == this.numOfFinancesToLoad;
-
-    this.loadingMore = false;
-  }
+  private activeTab = 0;
 
   private async refresh() {
     this.loading = true;
@@ -124,67 +90,45 @@ export default class Finance extends Vue {
       Number(this.$route.params.groupId)
     );
 
+    const balanceDataCall = groupApi.groupGroupIdBalanceGet(
+      Number(this.$route.params.groupId)
+    );
+
     this.group = (await groupCall).data;
     this.finances = (await financesCall).data;
+    this.balanceData = (await balanceDataCall).data;
 
-    this.showLoadMoreButton = this.finances.length == this.numOfFinancesToLoad;
     this.loading = false;
     this.atLeastOneRefreshDone = true;
   }
 
-  private onScroll() {
-    const bottomOfWindow =
-      document.documentElement.scrollTop + window.innerHeight ===
-      document.documentElement.offsetHeight;
-
-    if (bottomOfWindow) {
-      this.loadMore();
-    }
-  }
-
   private async mounted() {
-    window.addEventListener("scroll", this.onScroll);
     StateUtils.setActiveGroupId(Number(this.$route.params.groupId));
     StateUtils.setLastActiveDefaultRouteName(this.$route.name!);
     return this.refresh();
-  }
-
-  private async beforeDestroy() {
-    window.removeEventListener("scroll", this.onScroll);
   }
 }
 </script>
 
 <style scoped>
-.yourBalanceText {
-  padding-right: 0.5em;
+.balanceTab {
+  padding-left: 0;
+  padding-right: 0;
 }
-.yourBalanceNumber {
-  font-weight: bold;
+.tabsContainer {
+  margin-top: -3em;
 }
-
-.financeCard {
-  padding-top: 0.5em;
-}
-
 .cardsContainer {
   padding-top: 0.5em;
   padding-bottom: 1em;
 }
-
-.showMoreButton {
-  padding-bottom: 1em;
-}
-
-.panel-heading {
-  background-color: #ffffff42;
-}
-
 .groupContainer {
   margin-bottom: 0.5em;
 }
 .addButton {
   background-color: white;
   border-radius: 50%;
+  z-index: 1;
+  position: relative;
 }
 </style>
