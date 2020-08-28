@@ -9,27 +9,29 @@
         <router-link :to="{ name: routeAddFinance, params: { groupId: group.id } }">
           <b-icon class="addButton" type="is-info" icon="plus-circle" size="is-large"></b-icon>
         </router-link>
-
-        <b-tabs class="tabsContainer" v-model="activeTab" expanded>
-          <b-tab-item label="Entries">
-            <template slot="header">
-              <strong>Entries</strong>
-            </template>
-            <FinanceCardList
-              :group="group"
-              :finances="finances"
-              :numOfFinancesToLoad="numOfFinancesToLoad"
-            />
-          </b-tab-item>
-
-          <b-tab-item label="Balance">
-            <template slot="header">
-              <strong>Balance</strong>
-            </template>
-            <FinanceBalanceTab :group="group" :balanceData="balanceData" />
-          </b-tab-item>
-        </b-tabs>
       </div>
+
+      <b-tabs class="tabsContainer" v-model="activeTab" expanded>
+        <b-tab-item class="tabContent" label="Entries">
+          <template slot="header">
+            <b-icon icon="list"></b-icon>
+            <strong>Entries</strong>
+          </template>
+          <FinanceCardList
+            :group="group"
+            :finances="finances"
+            :numOfFinancesToLoad="numOfFinancesToLoad"
+          />
+        </b-tab-item>
+
+        <b-tab-item class="tabContent" label="Balance">
+          <template slot="header">
+            <b-icon icon="chart-pie"></b-icon>
+            <strong>Balance</strong>
+          </template>
+          <FinanceBalanceTab :group="group" :balanceData="balanceData" />
+        </b-tab-item>
+      </b-tabs>
     </template>
   </div>
 </template>
@@ -118,9 +120,14 @@ export default class Finance extends Vue {
 .tabsContainer {
   margin-top: -3em;
 }
+.tabContent {
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
 .cardsContainer {
   padding-top: 0.5em;
-  padding-bottom: 1em;
+  padding-bottom: 0em;
 }
 .groupContainer {
   margin-bottom: 0.5em;
