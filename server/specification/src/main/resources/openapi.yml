@@ -252,6 +252,28 @@ paths:
         '200':    # status code
           description: Successfully added the user.
 
+  /user/notifications:
+    get:
+      tags:
+        - "User"
+      summary:  Returns all notification which should be shown to the user.
+      parameters:
+        - in: query
+          name: deviceId
+          required: true
+          schema:
+            type: string
+          description: The the id of the device. This is that we dont send notification twice to the same device.
+      responses:
+        '200':    # status code
+          description: Successful call
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/notification'
+
   /user:
     get:
       tags:
@@ -907,6 +929,15 @@ components:
           description: Defines if this user is virtual or not.
         image:
           $ref: '#/components/schemas/imageData'
+
+    notification:
+      description: All data for a notification.
+      type: object
+      properties:
+        message:
+          type: string
+          example: A new finance entry was inserted.
+          description: the message to view
 
     imageData:
       description: Data on how to display an image.

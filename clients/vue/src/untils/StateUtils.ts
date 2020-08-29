@@ -29,4 +29,11 @@ export class StateUtils {
   public static unsetLastActiveDefaultRouteName() {
     localStorage.removeItem("lastActiveDefaultRouteName");
   }
+
+  public static setDeviceId(deviceId: string) {
+    localStorage.deviceId = deviceId;
+  }
+  public static getDeviceId(): string {
+    return localStorage.deviceId;
+  }
 }
