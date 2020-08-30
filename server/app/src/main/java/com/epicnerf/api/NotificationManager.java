@@ -2,7 +2,6 @@ package com.epicnerf.api;
 
 import com.epicnerf.hibernate.dao.NotificationDao;
 import com.epicnerf.hibernate.model.*;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,7 @@ public class NotificationManager {
                     String body = "Group: " + entry.getGroup().getName() +
                             "\nTitle: " + entry.getTitle() +
                             "\nYou own " + decimalFormat.format(moneyOwned) + "€ less to " + entry.getSpentFrom().getName();
-                    notificationDao.insertForAllDevicesOfUser(createNotification(title, body), userInGroup);
+                    notificationDao.insertForAllDevicesOfUser(title, body, userInGroup);
                 }
             }
         }
@@ -46,7 +45,7 @@ public class NotificationManager {
                     String body = "Group: " + entry.getGroup().getName() +
                             "\nTitle: " + entry.getTitle() +
                             "\nYou own " + decimalFormat.format(moneyOwned) + "€ to " + entry.getSpentFrom().getName();
-                    notificationDao.insertForAllDevicesOfUser(createNotification(title, body), userInGroup);
+                    notificationDao.insertForAllDevicesOfUser(title, body, userInGroup);
                 }
             }
         }
@@ -61,15 +60,8 @@ public class NotificationManager {
                     "\nTitle: " + entry.getTitle() +
                     "\nWho added: " + entry.getCreatedBy().getName() +
                     "\nTotal: " + decimalFormat.format(total) + "€";
-            notificationDao.insertForAllDevicesOfUser(createNotification(title, body), entry.getSpentFrom());
+            notificationDao.insertForAllDevicesOfUser(title, body, entry.getSpentFrom());
         }
-    }
-
-    private Notification createNotification(String title, String body) {
-        Notification notification = new Notification();
-        notification.setTitle(StringUtils.abbreviate(title, Notification.MAX_TITLE_LENGTH));
-        notification.setBody(StringUtils.abbreviate(body, Notification.MAX_BODY_LENGTH));
-        return notification;
     }
 
     private float getMoneyOwned(User user, FinanceEntry entry) {
@@ -86,7 +78,7 @@ public class NotificationManager {
         String body = "Group: " + chore.getGroup().getName() +
                 "\nChore: " + chore.getTitle();
 
-        notificationDao.insertForAllUsersOfGroup(createNotification(title, body), chore.getGroup(), Collections.singletonList(user));
+        notificationDao.insertForAllUsersOfGroup(title, body, chore.getGroup(), Collections.singletonList(user));
     }
 
     public void onChoreAdded(User user, Chore chore) {
@@ -94,7 +86,7 @@ public class NotificationManager {
         String body = "Group: " + chore.getGroup().getName() +
                 "\nChore: " + chore.getTitle();
 
-        notificationDao.insertForAllUsersOfGroup(createNotification(title, body), chore.getGroup(), Collections.singletonList(user));
+        notificationDao.insertForAllUsersOfGroup(title, body, chore.getGroup(), Collections.singletonList(user));
     }
 
     public void onChoreEntryDeleted(User user, Chore chore) {
@@ -103,7 +95,7 @@ public class NotificationManager {
                 "\nChore: " + chore.getTitle() +
                 "\nUser: " + user.getName();
 
-        notificationDao.insertForAllUsersOfGroup(createNotification(title, body), chore.getGroup(), Collections.singletonList(user));
+        notificationDao.insertForAllUsersOfGroup(title, body, chore.getGroup(), Collections.singletonList(user));
     }
 
     public void onChoreEntryAdded(User user, Chore chore) {
@@ -112,26 +104,26 @@ public class NotificationManager {
                 "\nChore: " + chore.getTitle() +
                 "\nUser: " + user.getName();
 
-        notificationDao.insertForAllUsersOfGroup(createNotification(title, body), chore.getGroup(), Collections.singletonList(user));
+        notificationDao.insertForAllUsersOfGroup(title, body, chore.getGroup(), Collections.singletonList(user));
     }
 
     public void onNewDeviceLink(User user, Device device) {
         String title = "New device registered";
         String body = "";
-        notificationDao.insertForAllDevicesOfUser(createNotification(title, body), user, Collections.singletonList(device));
+        notificationDao.insertForAllDevicesOfUser(title, body, user, Collections.singletonList(device));
     }
 
     public void onGroupDelete(User user, GroupObject group) {
         String title = "Group deleted";
         String body = "Group: " + group.getName();
 
-        notificationDao.insertForAllUsersOfGroup(createNotification(title, body), group, Collections.singletonList(user));
+        notificationDao.insertForAllUsersOfGroup(title, body, group, Collections.singletonList(user));
     }
 
     public void onGroupInviteSent(GroupInvite groupInvite) {
         String title = "New group invite";
         String body = "Group: " + groupInvite.getGroup().getName();
-        notificationDao.insertForAllDevicesOfUser(createNotification(title, body), groupInvite.getInvitedUser());
+        notificationDao.insertForAllDevicesOfUser(title, body, groupInvite.getInvitedUser());
     }
 
     public void onGroupInviteDeleted(User user, GroupInvite groupInvite) {
@@ -139,11 +131,11 @@ public class NotificationManager {
             String title = "Group invite rejected";
             String body = "Group: " + groupInvite.getGroup().getName() +
                     "\nEmail: " + groupInvite.getInvitedUser().getEmail();
-            notificationDao.insertForAllDevicesOfUser(createNotification(title, body), groupInvite.getGroup().getOwner());
+            notificationDao.insertForAllDevicesOfUser(title, body, groupInvite.getGroup().getOwner());
         } else {
             String title = "Group invite withdrawn";
             String body = "Group: " + groupInvite.getGroup().getName();
-            notificationDao.insertForAllDevicesOfUser(createNotification(title, body), groupInvite.getInvitedUser());
+            notificationDao.insertForAllDevicesOfUser(title, body, groupInvite.getInvitedUser());
         }
     }
 
@@ -155,7 +147,7 @@ public class NotificationManager {
         String title = "User joined group";
         String body = "Group: " + groupInvite.getGroup().getName() +
                 "\nUser: " + groupInvite.getInvitedUser().getName();
-        notificationDao.insertForAllUsersOfGroup(createNotification(title, body), groupInvite.getGroup(), Collections.singletonList(groupInvite.getInvitedUser()));
+        notificationDao.insertForAllUsersOfGroup(title, body, groupInvite.getGroup(), Collections.singletonList(groupInvite.getInvitedUser()));
     }
 
     public void onGroupLeft(User user, GroupObject group, User userLeft) {
@@ -164,7 +156,7 @@ public class NotificationManager {
                 "\nUser: " + userLeft.getName();
 
         User userToIgnore = user.getId().equals(userLeft.getId()) ? userLeft : group.getOwner();
-        notificationDao.insertForAllUsersOfGroup(createNotification(title, body), group, Collections.singletonList(userToIgnore));
+        notificationDao.insertForAllUsersOfGroup(title, body, group, Collections.singletonList(userToIgnore));
     }
 
     public void onVirtualUserJoined(GroupObject group, User virtualUser) {
@@ -172,6 +164,6 @@ public class NotificationManager {
         String body = "Group: " + group.getName() +
                 "\nUser: " + virtualUser.getName();
 
-        notificationDao.insertForAllUsersOfGroup(createNotification(title, body), group);
+        notificationDao.insertForAllUsersOfGroup(title, body, group);
     }
 }

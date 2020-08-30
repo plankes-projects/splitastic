@@ -15,6 +15,7 @@ import com.epicnerf.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.NoResultException;
@@ -249,13 +250,14 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
         throw new NoResultException();
     }
 
+    @NonNull
     private User getUserFromGroup(GroupObject group, int userId) {
         for (User user : group.getUsers()) {
             if (user.getId().equals(userId)) {
                 return user;
             }
         }
-        return null;
+        return new User(); //will not be reached
     }
 
     public ResponseEntity<Integer> groupPost() {
