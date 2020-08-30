@@ -51,6 +51,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { Group, ChoreSummary, ChoreApi, User } from "@/generated/api-axios";
 import { RouterNames } from "@/untils/RouterNames";
 import config from "@/../config";
+import { StateUtils } from '@/untils/StateUtils';
 
 class UserAndCount {
   public count = 0;
@@ -97,7 +98,7 @@ export default class ChoreCard extends Vue {
     this.changeCount = true;
     const api = new ChoreApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     await api.choreChoreIdPost(Number(this.choreSum!.chore!.id));
@@ -132,7 +133,7 @@ export default class ChoreCard extends Vue {
     this.changeCount = true;
     const api = new ChoreApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     await api.choreChoreIdEntryDelete(Number(this.choreSum!.chore!.id));

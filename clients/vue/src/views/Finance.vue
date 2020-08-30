@@ -76,12 +76,12 @@ export default class Finance extends Vue {
     this.loading = true;
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     const financeApi = new FinanceApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     const financesCall = financeApi.groupGroupIdFinanceGet(

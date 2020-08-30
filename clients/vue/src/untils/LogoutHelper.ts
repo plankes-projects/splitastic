@@ -3,7 +3,7 @@ import { StateUtils } from "./StateUtils";
 
 export class LogoutHelper {
   public static logout(vm: Vue) {
-    localStorage.removeItem("apiKey");
+    StateUtils.unsetApiKey();
     StateUtils.unsetActiveGroupId();
     vm.$router.push({ name: RouterNames.LOGIN });
   }

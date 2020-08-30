@@ -1,6 +1,19 @@
 import { RouterNames } from "./RouterNames";
 
 export class StateUtils {
+  private static registration: ServiceWorkerRegistration | null = null;
+
+  public static initNavigatorRegistration(
+    registration: ServiceWorkerRegistration
+  ) {
+    this.registration = registration;
+    if (this.hasApiKey()) {
+      this.setApiKeyInServiceWorker();
+    } else {
+      this.unsetApiKeyInServiceWorker();
+    }
+  }
+
   public static setActiveGroupId(groupId: number) {
     localStorage.lastFinanceGroupId = groupId;
   }
@@ -28,5 +41,37 @@ export class StateUtils {
   }
   public static unsetLastActiveDefaultRouteName() {
     localStorage.removeItem("lastActiveDefaultRouteName");
+  }
+
+  public static setApiKey(apiKey: string) {
+    localStorage.apiKey = apiKey;
+    this.setApiKeyInServiceWorker();
+  }
+
+  private static setApiKeyInServiceWorker() {
+    if (StateUtils.registration !== null) {
+      StateUtils.registration.active!.postMessage({
+        type: "setApiKey",
+        data: this.getApiKey(),
+      });
+    }
+  }
+
+  public static getApiKey(): string {
+    return localStorage.apiKey;
+  }
+  public static hasApiKey(): boolean {
+    return localStorage.apiKey != undefined;
+  }
+  public static unsetApiKey() {
+    localStorage.removeItem("apiKey");
+    this.unsetApiKeyInServiceWorker();
+  }
+  private static unsetApiKeyInServiceWorker() {
+    if (StateUtils.registration !== null) {
+      StateUtils.registration.active!.postMessage({
+        type: "unsetApiKey",
+      });
+    }
   }
 }

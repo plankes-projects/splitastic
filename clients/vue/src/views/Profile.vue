@@ -34,6 +34,7 @@ import { UserApi, User } from "@/generated/api-axios";
 import config from "@/../config";
 import { LogoutHelper } from "@/untils/LogoutHelper";
 import { FileUtils } from "@/untils/FileUtils";
+import { StateUtils } from "@/untils/StateUtils";
 
 @Component
 export default class Profile extends Vue {
@@ -51,7 +52,7 @@ export default class Profile extends Vue {
   private async logoutOnAll() {
     const api = new UserApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     await api.userResetApiKeyPut();
@@ -62,7 +63,7 @@ export default class Profile extends Vue {
     this.savingUserDetails = true;
     const api = new UserApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     if (this.newProfileImage) {
@@ -91,7 +92,7 @@ export default class Profile extends Vue {
     this.newProfileImage = null;
     const api = new UserApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
     this.user = (await api.userGet()).data;
     this.imageUrl = this.user!.image!.url!;

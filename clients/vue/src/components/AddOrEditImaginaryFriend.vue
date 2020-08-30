@@ -28,6 +28,7 @@ import { Component, Vue, Prop } from "vue-property-decorator";
 import config from "@/../config";
 import { GroupApi, User, UserApi } from "@/generated/api-axios";
 import { FileUtils } from "@/untils/FileUtils";
+import { StateUtils } from "@/untils/StateUtils";
 
 @Component
 export default class AddOrEditImaginaryFriend extends Vue {
@@ -79,7 +80,7 @@ export default class AddOrEditImaginaryFriend extends Vue {
   private async createUser() {
     const api = new GroupApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
     await api.groupGroupIdAddVirtualUserPost(Number(this.groupId), {
       name: this.userName
@@ -89,7 +90,7 @@ export default class AddOrEditImaginaryFriend extends Vue {
   private async updateUser() {
     const api = new UserApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     const userToUpdate = Object.assign({}, this.user!);

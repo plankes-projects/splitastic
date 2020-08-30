@@ -10,6 +10,7 @@ import { Component, Vue } from "vue-property-decorator";
 import config from "@/../config";
 import { RouterNames } from "@/untils/RouterNames";
 import { GroupApi, Configuration } from "@/generated/api-axios";
+import { StateUtils } from "@/untils/StateUtils";
 
 @Component
 export default class CreateGroup extends Vue {
@@ -17,7 +18,7 @@ export default class CreateGroup extends Vue {
   public async createGroup() {
     const apiConfig: Configuration = {
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     };
     const groupApi = new GroupApi(apiConfig);
     const groupId = (await groupApi.groupPost()).data;

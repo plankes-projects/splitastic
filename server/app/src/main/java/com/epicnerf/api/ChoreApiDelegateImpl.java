@@ -37,12 +37,16 @@ public class ChoreApiDelegateImpl implements ChoreApiDelegate {
     @Autowired
     private MapToOpenApiModel mapToOpenApiModel;
 
+    @Autowired
+    private NotificationManager notificationManager;
+
     public ResponseEntity<Void> choreChoreIdDelete(Integer choreId) {
         User user = apiSupport.getCurrentUser();
         Optional<Chore> chore = choreRepository.findById(choreId);
 
         if (chore.isPresent() && chore.get().getGroup().getOwner().getId().equals(user.getId())) {
             choreDao.deleteChore(chore.get());
+            notificationManager.onChoreDeleted(user, chore.get());
             return new ResponseEntity<>(HttpStatus.OK);
         }
         throw new NoResultException();
@@ -54,6 +58,7 @@ public class ChoreApiDelegateImpl implements ChoreApiDelegate {
         if (chore.isPresent()) {
             apiSupport.validateUserIsInGroup(chore.get().getGroup(), user.getId());
             choreDao.deleteLatestChoreEntry(chore.get(), user);
+            notificationManager.onChoreEntryDeleted(user, chore.get());
             return new ResponseEntity<>(HttpStatus.OK);
         }
 
@@ -70,6 +75,7 @@ public class ChoreApiDelegateImpl implements ChoreApiDelegate {
             entry.setChore(chore.get());
             entry.setUser(user);
             choreEntryRepository.save(entry);
+            notificationManager.onChoreEntryAdded(user, chore.get());
             return new ResponseEntity<>(HttpStatus.OK);
         }
 
@@ -98,6 +104,7 @@ public class ChoreApiDelegateImpl implements ChoreApiDelegate {
             chore.setGroup(group.get());
 
             choreRepository.save(chore);
+            notificationManager.onChoreAdded(user, chore);
             return ResponseEntity.ok(chore.getId());
         }
         throw new NoResultException();

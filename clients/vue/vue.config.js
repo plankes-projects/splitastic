@@ -1,4 +1,10 @@
 module.exports = {
+  pwa: {
+    workboxPluginMode: "InjectManifest",
+    workboxOptions: {
+      swSrc: "src/service-worker.js",
+    },
+  },
   css: {
     loaderOptions: {
       sass: {
@@ -6,12 +12,10 @@ module.exports = {
       },
     },
   },
-  chainWebpack: config => {
-    config
-      .plugin('html')
-      .tap(args => {
-        args[0].title = 'Splitastic'
-        return args
-      })
-  }
+  chainWebpack: (config) => {
+    config.plugin("html").tap((args) => {
+      args[0].title = "Splitastic";
+      return args;
+    });
+  },
 };

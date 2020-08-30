@@ -30,6 +30,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from "vue-property-decorator";
 import { RouterNames } from "@/untils/RouterNames";
+import { StateUtils } from "./untils/StateUtils";
 
 @Component
 export default class App extends Vue {
@@ -44,7 +45,7 @@ export default class App extends Vue {
 
   @Watch("$route")
   private routeChanged() {
-    this.hasApiKey = localStorage.apiKey;
+    this.hasApiKey = StateUtils.hasApiKey();
 
     if (this.$router.currentRoute.name == RouterNames.ERROR) {
       return;

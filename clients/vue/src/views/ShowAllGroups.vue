@@ -51,6 +51,7 @@ import {
   Invite
 } from "@/generated/api-axios/api";
 import GroupCard from "@/components/GroupCard.vue";
+import { StateUtils } from "@/untils/StateUtils";
 
 @Component({
   components: {
@@ -79,7 +80,7 @@ export default class ShowAllGroups extends Vue {
   private async deleteInvite(inviteId: number) {
     const api = new GroupApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     try {
@@ -109,7 +110,7 @@ export default class ShowAllGroups extends Vue {
   private async acceptInvite(groupId: number) {
     const userApi = new UserApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     try {
@@ -130,7 +131,7 @@ export default class ShowAllGroups extends Vue {
     this.loading = true;
     const apiConfig: Configuration = {
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     };
     const userApi = new UserApi(apiConfig);
     const groupApi = new GroupApi(apiConfig);
