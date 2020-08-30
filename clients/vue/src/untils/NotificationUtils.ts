@@ -39,7 +39,6 @@ export class NotificationUtils {
   }
 
   private static async sendTokenToServer(token: string) {
-    console.log("send to server: " + token);
     const api = new UserApi({
       basePath: config.basePath,
       apiKey: StateUtils.getApiKey(),
