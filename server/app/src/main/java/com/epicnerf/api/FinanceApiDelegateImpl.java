@@ -29,18 +29,22 @@ public class FinanceApiDelegateImpl implements FinanceApiDelegate {
     @Autowired
     private MapToOpenApiModel openApiMapper;
 
+    @Autowired
+    private NotificationManager notificationManager;
+
     public ResponseEntity<Void> financeFinanceIdDelete(Integer financeId) {
         Optional<FinanceEntry> finance = financeRepository.findById(financeId);
 
-        if (finance.isPresent() && canDelete(finance.get())) {
+        User user = apiSupport.getCurrentUser();
+        if (finance.isPresent() && canDelete(finance.get(), user)) {
             financeRepository.delete(finance.get());
+            notificationManager.onFinanceEntryDelete(user, finance.get());
             return new ResponseEntity<>(HttpStatus.OK);
         }
         throw new NoResultException();
     }
 
-    private boolean canDelete(FinanceEntry financeEntry) {
-        User user = apiSupport.getCurrentUser();
+    private boolean canDelete(FinanceEntry financeEntry, User user) {
         if (financeEntry.getSpentFrom().getId().equals(user.getId())) {
             return true;
         }

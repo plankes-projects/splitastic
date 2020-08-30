@@ -8,6 +8,9 @@ import java.util.Date;
 
 @Entity
 public class Notification {
+    public static final int MAX_TITLE_LENGTH = 65;
+    public static final int MAX_BODY_LENGTH = 65;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -25,10 +28,12 @@ public class Notification {
     @ManyToOne(optional = false)
     private Device device;
 
-    @Column(nullable = false, length = 34)
+    // according to https://gravitec.net/blog/push-notification-character-limit-for-ios-android-and-web/
+    @Column(nullable = false, length = MAX_TITLE_LENGTH)
     private String title;
 
-    @Column(nullable = false, length = 41)
+    // according to https://gravitec.net/blog/push-notification-character-limit-for-ios-android-and-web/
+    @Column(nullable = false, length = MAX_BODY_LENGTH)
     private String body;
 
     @Column(length = 2000)

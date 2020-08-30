@@ -64,6 +64,9 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private NotificationManager notificationManager;
+
     public ResponseEntity<List<Group>> groupGet(Integer num, Integer lastId) {
         User user = apiSupport.getCurrentUser();
         List<Group> result = openApiMapper.map(groupObjectDao.paginateGroups(user, num, lastId), user);
@@ -79,6 +82,8 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
             groupInviteDao.deleteAllGroupInvites(group.get());
             financeEntryDao.deleteAllFinanceEntries(group.get());
             groupObjectRepository.delete(group.get());
+
+            notificationManager.onGroupDelete(user, group.get());
             return new ResponseEntity<>(HttpStatus.OK);
         }
         throw new NoResultException();
@@ -108,6 +113,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
             f.setCreatedBy(user);
             f.setGroup(group.get());
             financeRepository.save(f);
+            notificationManager.onFinanceEntryAdded(user, f);
 
             return ResponseEntity.ok(openApiMapper.map(f));
         }
@@ -127,6 +133,8 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
 
             group.get().getUsers().add(newUser);
             groupObjectRepository.save(group.get());
+
+            notificationManager.onVirtualUserJoined(group.get(), newUser);
 
             return new ResponseEntity<>(HttpStatus.OK);
         }
@@ -171,6 +179,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
 
             GroupInvite invite = groupInviteDao.getGroupInvite(user, g.get());
             groupInviteRepository.delete(invite);
+            notificationManager.onGroupInviteAccepted(invite);
             return new ResponseEntity<>(HttpStatus.OK);
         }
 
@@ -214,6 +223,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
             invite.setGroup(g.get());
             invite.setInvitedUser(u);
             groupInviteRepository.save(invite);
+            notificationManager.onGroupInviteSent(invite);
 
             return new ResponseEntity<>(HttpStatus.OK);
         }
@@ -228,13 +238,24 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
             boolean isOtherUser = !user.getId().equals(userId);
 
             if ((isOwner && isOtherUser) || (!isOwner && !isOtherUser)) {
+                User userLeft = getUserFromGroup(g.get(), userId);
                 g.get().getUsers().removeIf(u -> u.getId().equals(userId));
                 groupObjectRepository.save(g.get());
+                notificationManager.onGroupLeft(user, g.get(), userLeft);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
         }
 
         throw new NoResultException();
+    }
+
+    private User getUserFromGroup(GroupObject group, int userId) {
+        for (User user : group.getUsers()) {
+            if (user.getId().equals(userId)) {
+                return user;
+            }
+        }
+        return null;
     }
 
     public ResponseEntity<Integer> groupPost() {
@@ -270,6 +291,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
             deletable = deletable || i.get().getGroup().getOwner().getId().equals(user.getId());
             if (deletable) {
                 groupInviteRepository.delete(i.get());
+                notificationManager.onGroupInviteDeleted(user, i.get());
                 return new ResponseEntity<>(HttpStatus.OK);
             }
         }

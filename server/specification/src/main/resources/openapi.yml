@@ -939,12 +939,12 @@ components:
       properties:
         title:
           type: string
-          maxLength: 34 # best practice
+          maxLength: 65 # according to https://gravitec.net/blog/push-notification-character-limit-for-ios-android-and-web/
           example: A new finance entry was inserted.
           description: the title to view
         body:
           type: string
-          maxLength: 41 # best practice
+          maxLength: 240 # according to https://gravitec.net/blog/push-notification-character-limit-for-ios-android-and-web/
           example: A new finance entry was inserted.
           description: the message to view
         tag:
