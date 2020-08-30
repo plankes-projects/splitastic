@@ -12,11 +12,11 @@ function generateDeviceId() {
   return deviceId;
 }
 
-function getDeviceId(forceNewDeviceId) {
+function getDeviceId() {
   const tokenKey = "deviceId";
 
   return localforage.getItem(tokenKey).then(function(deviceId) {
-    if (!deviceId || forceNewDeviceId) {
+    if (!deviceId) {
       deviceId = generateDeviceId();
       return localforage.setItem(tokenKey, deviceId).then(function() {
         return deviceId;
@@ -34,13 +34,7 @@ self.addEventListener("message", (event) => {
   }
 
   if (event.data.type == "getDeviceId") {
-    getDeviceId(false).then(function(deviceId) {
-      event.source.postMessage({ type: "putDeviceId", data: deviceId });
-    });
-  }
-
-  if (event.data.type == "resetDeviceId") {
-    getDeviceId(true).then(function(deviceId) {
+    getDeviceId().then(function(deviceId) {
       event.source.postMessage({ type: "putDeviceId", data: deviceId });
     });
   }
@@ -68,7 +62,7 @@ function showNotification(notification) {
 }
 
 function showNotificationIfNeeded() {
-  getDeviceId(false)
+  getDeviceId()
     .then(function(deviceId) {
       return localforage.getItem("apiBasePath").then(function(base) {
         const url = base + "/user/notifications?deviceId=" + deviceId;
