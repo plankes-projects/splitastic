@@ -72,9 +72,8 @@ public class NotificationDao {
 
         device.setUser(user);
 
-        //this shall be called before the save, such we only send notification to current devices
-        notificationManager.onNewDeviceLink(user, device);
         deviceRepository.save(device);
+        notificationManager.onNewDeviceLink(user, device);
     }
 
     public void insertForAllUsersOfGroup(@NonNull String title, @NonNull String body, @NonNull GroupObject group) {
