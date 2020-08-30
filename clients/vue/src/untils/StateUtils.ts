@@ -1,3 +1,5 @@
+import { NotificationUtils } from "./NotificationUtils";
+
 export class StateUtils {
   private static registration: ServiceWorkerRegistration | null = null;
 
@@ -32,6 +34,7 @@ export class StateUtils {
 
   public static setApiKey(apiKey: string) {
     localStorage.apiKey = apiKey;
+    NotificationUtils.refreshFirebaseToken();
   }
 
   public static getApiKey(): string {
@@ -42,18 +45,6 @@ export class StateUtils {
   }
   public static unsetApiKey() {
     localStorage.removeItem("apiKey");
-  }
-
-  public static setFireBaseToken(fireBaseToken: string) {
-    localStorage.fireBaseToken = fireBaseToken;
-  }
-  public static getFireBaseToken(): string {
-    return localStorage.fireBaseToken;
-  }
-  public static hasFireBaseToken(): boolean {
-    return localStorage.fireBaseToken != undefined;
-  }
-  public static unsetFireBaseToken() {
-    localStorage.removeItem("fireBaseToken");
+    NotificationUtils.refreshFirebaseToken();
   }
 }

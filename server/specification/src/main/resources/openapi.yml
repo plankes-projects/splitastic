@@ -287,6 +287,22 @@ paths:
         '200':    # status code
           description: Successfully resetted the api key.
 
+  /user/firebaseToken:
+    put:
+      tags:
+        - "User"
+      summary: Links the firebase token to this user.
+      parameters:
+        - in: query
+          name: firebaseToken
+          required: true
+          schema:
+            type: string
+          description: The firebase token of this device.
+      responses:
+        '200':    # status code
+          description: Successful call
+
   /group/{groupId}/join:
     put:
       tags:

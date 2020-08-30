@@ -5,6 +5,7 @@ import com.epicnerf.hibernate.model.Device;
 import com.epicnerf.hibernate.model.GroupObject;
 import com.epicnerf.hibernate.model.User;
 import com.epicnerf.hibernate.repository.DeviceRepository;
+import com.epicnerf.service.PushNotificationService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -16,6 +17,7 @@ import javax.transaction.Transactional;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Transactional
@@ -26,18 +28,19 @@ public class NotificationDao {
     private DeviceRepository deviceRepository;
     @Autowired
     private NotificationManager notificationManager;
+    @Autowired
+    private PushNotificationService pushNotificationService;
 
-    public void removeUserMapping(String deviceIdentifier) {
+    public void removeUserMapping(User user) {
         entityManager
-                .createNativeQuery("update device set user_id = null where device_identifier = :deviceIdentifier")
-                .setParameter("deviceIdentifier", deviceIdentifier)
+                .createNativeQuery("delete from device where user_id = :uid")
+                .setParameter("uid", user.getId())
                 .executeUpdate();
     }
 
     public void updateUserMapping(String deviceIdentifier, User user) {
         // 99% of the time mapping is ok, thus it is a little bit faster if we check before.
         if (!isMappingOk(deviceIdentifier, user)) {
-            removeUserMapping(deviceIdentifier);
             addUserMapping(deviceIdentifier, user);
         }
     }
@@ -104,14 +107,15 @@ public class NotificationDao {
     }
 
     public void insertForAllDevicesOfUser(@NonNull String title, @NonNull String body, @NonNull User user, @NonNull List<Device> exceptions) {
-        List<Device> allDevices = getAllDevicesOfUser(user);
-        for (Device device : allDevices) {
-            if (!isException(device, exceptions)) {
-                //todo send push
-                title = StringUtils.abbreviate(title, 65);
-                body = StringUtils.abbreviate(body, 240);
-            }
-        }
+        List<String> keys = getAllDevicesOfUser(user)
+                .stream()
+                .filter(device -> !isException(device, exceptions))
+                .map(Device::getDeviceIdentifier)
+                .collect(Collectors.toList());
+
+        title = StringUtils.abbreviate(title, 65);
+        body = StringUtils.abbreviate(body, 240);
+        pushNotificationService.sendPushNotification(keys, title, body);
     }
 
     public void insertForAllDevicesOfUser(@NonNull String title, @NonNull String body, @NonNull User user) {
