@@ -113,7 +113,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
             f.setCreatedBy(user);
             f.setGroup(group.get());
             financeRepository.save(f);
-            notificationManager.onFinanceEntryAdded(user, f);
+            notificationManager.onFinanceEntryAdded(f);
 
             return ResponseEntity.ok(openApiMapper.map(f));
         }

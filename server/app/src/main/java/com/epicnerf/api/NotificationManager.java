@@ -37,10 +37,10 @@ public class NotificationManager {
         }
     }
 
-    public void onFinanceEntryAdded(User user, FinanceEntry entry) {
+    public void onFinanceEntryAdded(FinanceEntry entry) {
         String title = "Expense added";
         for (User userInGroup : entry.getGroup().getUsers()) {
-            if (!user.getId().equals(userInGroup.getId())) {
+            if (!entry.getSpentFrom().getId().equals(userInGroup.getId())) {
                 float moneyOwned = getMoneyOwned(userInGroup, entry);
                 if (moneyOwned > 0) {
                     String body = "Group: " + entry.getGroup().getName() +
@@ -49,6 +49,19 @@ public class NotificationManager {
                     notificationDao.insertForAllDevicesOfUser(createNotification(title, body), userInGroup);
                 }
             }
+        }
+
+        if (!entry.getSpentFrom().getId().equals(entry.getCreatedBy().getId())) {
+            float total = (float) entry.getEntries()
+                    .stream()
+                    .mapToDouble(e -> e.getAmount().doubleValue())
+                    .sum();
+            title = "Your expense was added";
+            String body = "Group: " + entry.getGroup().getName() +
+                    "\nTitle: " + entry.getTitle() +
+                    "\nWho added: " + entry.getCreatedBy().getName() +
+                    "\nTotal: " + decimalFormat.format(total) + "€";
+            notificationDao.insertForAllDevicesOfUser(createNotification(title, body), entry.getSpentFrom());
         }
     }
 
