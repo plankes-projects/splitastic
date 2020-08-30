@@ -263,6 +263,8 @@ paths:
           required: true
           schema:
             type: string
+            maxLength: 200
+            minLength: 200
           description: The the id of the device. This is that we dont send notification twice to the same device.
       responses:
         '200':    # status code
@@ -933,11 +935,29 @@ components:
     notification:
       description: All data for a notification.
       type: object
+      required: [title, body, tag, timestamp]
       properties:
-        message:
+        title:
           type: string
+          maxLength: 34 # best practice
+          example: A new finance entry was inserted.
+          description: the title to view
+        body:
+          type: string
+          maxLength: 41 # best practice
           example: A new finance entry was inserted.
           description: the message to view
+        tag:
+          type: integer
+          description: An ID for a given notification that allows you to find, replace, or remove the notification using a script if necessary.
+        timestamp:
+          type: string
+          format: date-time
+          description: Representing the time when the notification was created. It can be used to indicate the time at which a notification is actual. For example, this could be in the past when a notification is used for a message that couldn’t immediately be delivered because the device was offline, or in the future for a meeting that is about to start.
+        data:
+          type: object
+          description: Arbitrary data that you want to be associated with the notification.
+
 
     imageData:
       description: Data on how to display an image.

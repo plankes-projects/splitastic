@@ -61,6 +61,7 @@ import {
   LoginData
 } from "@/generated/api-axios/api";
 import { RouterNames } from "@/untils/RouterNames";
+import { StateUtils } from "@/untils/StateUtils";
 
 @Component
 export default class Login extends Vue {
@@ -104,7 +105,7 @@ export default class Login extends Vue {
       const result = await this.autenticationApi.loginPut(
         this.loginData.token ?? ""
       );
-      localStorage.apiKey = result.data.token;
+      StateUtils.setApiKey(result.data.token!);
       localStorage.userId = result.data.userId;
       this.insertEmailView = true;
       this.loginSuccess();
@@ -127,7 +128,7 @@ export default class Login extends Vue {
   }
 
   private mounted() {
-    if (localStorage.apiKey) {
+    if (StateUtils.hasApiKey()) {
       this.loginSuccess();
       return;
     }

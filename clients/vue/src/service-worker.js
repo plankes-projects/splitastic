@@ -33,14 +33,16 @@ self.addEventListener("message", (event) => {
     self.skipWaiting();
   }
 
-  if (event.data.type == "getDeviceId") {
-    getDeviceId().then(function(deviceId) {
-      event.source.postMessage({ type: "putDeviceId", data: deviceId });
-    });
-  }
-
   if (event.data.type == "setApiBasePath") {
     localforage.setItem("apiBasePath", event.data.data);
+  }
+
+  if (event.data.type == "setApiKey") {
+    localforage.setItem("apiKey", event.data.data);
+  }
+
+  if (event.data.type == "unsetApiKey") {
+    localforage.removeItem("apiKey");
   }
 });
 
@@ -57,22 +59,33 @@ function showNotification(notification) {
   // but since we poll them regularly this cannot happen.
   // Additionally we could send also other stuff with this request to the server in the furture.
   if (Notification.permission == "granted") {
-    self.registration.showNotification(notification.message);
+    self.registration.showNotification(notification.title, {
+      body: notification.body,
+      tag: notification.tag,
+      timestamp: Math.floor(Date.parse(notification.timestamp)),
+      data: notification.data,
+    });
   }
 }
 
 function showNotificationIfNeeded() {
-  getDeviceId()
-    .then(function(deviceId) {
-      return localforage.getItem("apiBasePath").then(function(base) {
-        const url = base + "/user/notifications?deviceId=" + deviceId;
-        return fetch(url)
-          .then((response) => response.json())
-          .then((notifications) =>
-            notifications.forEach((notification) =>
-              showNotification(notification)
-            )
-          );
+  return localforage
+    .getItem("apiKey")
+    .then(function(apiKey) {
+      if (!apiKey) {
+        apiKey = "";
+      }
+      return getDeviceId().then(function(deviceId) {
+        return localforage.getItem("apiBasePath").then(function(base) {
+          const url = base + "/user/notifications?deviceId=" + deviceId;
+          return fetch(url, { headers: { "X-API-KEY": apiKey } })
+            .then((response) => response.json())
+            .then((notifications) =>
+              notifications.forEach((notification) =>
+                showNotification(notification)
+              )
+            );
+        });
       });
     })
     .catch((error) => console.error(error));

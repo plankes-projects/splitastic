@@ -33,19 +33,11 @@ new Vue({
 
 // ##################################################
 // setup service worker communication for notfication
-navigator.serviceWorker.addEventListener("message", (event) => {
-  if (event.data.type == "putDeviceId") {
-    StateUtils.setDeviceId(event.data.data);
-  }
-});
 navigator.serviceWorker.ready.then((registration) => {
+  StateUtils.initNavigatorRegistration(registration);
   registration.active!.postMessage({
     type: "setApiBasePath",
     data: config.basePath,
-  });
-
-  registration.active!.postMessage({
-    type: "getDeviceId",
   });
 });
 // ##################################################

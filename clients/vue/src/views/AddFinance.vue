@@ -95,6 +95,7 @@ import {
   User
 } from "@/generated/api-axios";
 import config from "@/../config";
+import { StateUtils } from "@/untils/StateUtils";
 
 @Component
 export default class AddFinance extends Vue {
@@ -181,7 +182,7 @@ export default class AddFinance extends Vue {
 
     const api = new FinanceApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     this.loading = true;
@@ -197,11 +198,11 @@ export default class AddFinance extends Vue {
     this.loading = true;
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
     const financeApi = new FinanceApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     const groupPromise = groupApi.groupGroupIdGet(

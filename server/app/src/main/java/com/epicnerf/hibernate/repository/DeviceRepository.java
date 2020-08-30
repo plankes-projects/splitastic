@@ -1,8 +1,8 @@
 package com.epicnerf.hibernate.repository;
 
-import com.epicnerf.hibernate.model.Notification;
+import com.epicnerf.hibernate.model.Device;
 import org.springframework.data.repository.CrudRepository;
 
-public interface NotificationRepository extends CrudRepository<Notification, Long> {
+public interface DeviceRepository extends CrudRepository<Device, Integer> {
 
 }

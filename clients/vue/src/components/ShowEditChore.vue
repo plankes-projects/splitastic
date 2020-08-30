@@ -71,7 +71,7 @@ export default class ShowEditChore extends Vue {
   private async deleteChore() {
     const api = new ChoreApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     await api.choreChoreIdDelete(Number(this.$route.params.choreId));
@@ -89,7 +89,7 @@ export default class ShowEditChore extends Vue {
     this.savingDetails = true;
     const api = new ChoreApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     await api.chorePut({
@@ -109,7 +109,7 @@ export default class ShowEditChore extends Vue {
     this.loading = true;
     const api = new ChoreApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     const chore = (

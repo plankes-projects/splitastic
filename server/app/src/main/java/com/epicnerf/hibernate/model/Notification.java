@@ -7,11 +7,10 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "group_invite", uniqueConstraints = {@UniqueConstraint(columnNames = {"group_id", "invited_user_id"})})
-public class Device {
+public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Long id;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -23,17 +22,23 @@ public class Device {
     @Column(name = "modify_date", nullable = false)
     private Date modifyDate;
 
-    @Column(nullable = false, unique = true, length = 200)
-    private String deviceIdentifier;
+    @ManyToOne(optional = false)
+    private Device device;
 
-    @ManyToOne
-    private User user;
+    @Column(nullable = false, length = 34)
+    private String title;
 
-    public Integer getId() {
+    @Column(nullable = false, length = 41)
+    private String body;
+
+    @Column(length = 2000)
+    private String data;
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -53,19 +58,35 @@ public class Device {
         this.modifyDate = modifyDate;
     }
 
-    public String getDeviceIdentifier() {
-        return deviceIdentifier;
+    public Device getDevice() {
+        return device;
     }
 
-    public void setDeviceIdentifier(String deviceIdentifier) {
-        this.deviceIdentifier = deviceIdentifier;
+    public void setDevice(Device device) {
+        this.device = device;
     }
 
-    public User getUser() {
-        return user;
+    public String getTitle() {
+        return title;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 }

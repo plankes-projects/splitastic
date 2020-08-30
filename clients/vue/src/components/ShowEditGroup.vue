@@ -215,7 +215,7 @@ export default class ShowEditGroup extends Vue {
   private async deleteGroup(groupId: number) {
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
     try {
       this.loading = true;
@@ -247,7 +247,7 @@ export default class ShowEditGroup extends Vue {
   private async deleteUser(userId: number, isLeave: boolean) {
     const api = new UserApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
     try {
       this.loading = true;
@@ -283,7 +283,7 @@ export default class ShowEditGroup extends Vue {
   private async deleteInvite(inviteId: number) {
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
     try {
       this.loading = true;
@@ -301,7 +301,7 @@ export default class ShowEditGroup extends Vue {
   private async sendInvite() {
     const api = new UserApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     try {
@@ -325,7 +325,7 @@ export default class ShowEditGroup extends Vue {
     this.savingGroupDetails = true;
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     if (this.newProfileImage) {
@@ -364,7 +364,7 @@ export default class ShowEditGroup extends Vue {
     this.loading = true;
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     this.group = (

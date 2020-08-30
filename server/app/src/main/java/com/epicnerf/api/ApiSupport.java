@@ -46,7 +46,7 @@ public class ApiSupport {
         try {
             HttpServletRequest request = getCurrentHttpRequest();
             String token = request.getHeader("X-API-KEY");
-            if (token == null) {
+            if (token == null || token.isEmpty()) {
                 throw new NoResultException();
             }
             return userDao.getUserWithToken(token);

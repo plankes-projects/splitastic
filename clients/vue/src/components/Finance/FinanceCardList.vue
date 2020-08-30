@@ -66,7 +66,7 @@ export default class FinanceCardList extends Vue {
     const lastFinance = this.finances[this.finances.length - 1];
     const api = new FinanceApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     const newFinances = (

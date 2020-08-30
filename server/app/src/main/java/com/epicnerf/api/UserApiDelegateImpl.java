@@ -1,8 +1,10 @@
 package com.epicnerf.api;
 
+import com.epicnerf.exception.AuthenticationException;
 import com.epicnerf.hibernate.MapToOpenApiModel;
 import com.epicnerf.hibernate.dao.GroupInviteDao;
 import com.epicnerf.hibernate.dao.ImageDataDao;
+import com.epicnerf.hibernate.dao.NotificationDao;
 import com.epicnerf.hibernate.dao.UserDao;
 import com.epicnerf.hibernate.model.GroupInvite;
 import com.epicnerf.hibernate.model.ImageData;
@@ -41,6 +43,8 @@ public class UserApiDelegateImpl implements UserApiDelegate {
 
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private NotificationDao notificationDao;
 
     public ResponseEntity<User> userGet() {
         User u = openApiMapper.map(apiSupport.getCurrentUser());
@@ -76,10 +80,14 @@ public class UserApiDelegateImpl implements UserApiDelegate {
 
     public ResponseEntity<List<Notification>> userNotificationsGet(String deviceId) {
         List<Notification> notifications = new ArrayList<>();
+        try {
+            com.epicnerf.hibernate.model.User u = apiSupport.getCurrentUser();
+            notificationDao.updateUserMapping(deviceId, u);
+            notifications = openApiMapper.map(notificationDao.getAndDeleteNotifications(deviceId));
+        } catch (AuthenticationException e) {
+            notificationDao.removeUserMappingAndDeletePendingNotifications(deviceId);
+        }
 
-        //Notification n = new Notification();
-        //n.setMessage("Hello notifications!");
-        //notifications.add(n);
         return ResponseEntity.ok(notifications);
     }
 }

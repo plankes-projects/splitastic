@@ -50,7 +50,7 @@ export default class Chore extends Vue {
   private async createNewChore() {
     const choreApi = new ChoreApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     const choreId = (
@@ -102,12 +102,12 @@ export default class Chore extends Vue {
     this.loading = true;
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     const choreApi = new ChoreApi({
       basePath: config.basePath,
-      apiKey: localStorage.apiKey
+      apiKey: StateUtils.getApiKey()
     });
 
     const sumsCall = choreApi.choreSummariesGroupIdGet(
