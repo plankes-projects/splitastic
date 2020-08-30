@@ -4,7 +4,8 @@ HTML5 History Mode is enabled, therefore you have to add a little configuration 
 https://router.vuejs.org/guide/essentials/history-mode.html#example-server-configurations
 
 ## Project setup
-Create config.ts from config.ts.template and fill data.
+* Create config.ts from config.ts.template and fill data.
+* Create public/firebase.config.js from public/firebase.config.js.template and fill data. (that are parts of config.ts)
 
 ```
 npm install
