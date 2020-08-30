@@ -24,7 +24,12 @@
             <b>{{ email }}</b>
           </div>
           <div>
-            <b-icon icon="sync" size="is-large" type="is-success" class="fa-spin"></b-icon>
+            <b-icon
+              icon="sync"
+              size="is-large"
+              type="is-success"
+              class="fa-spin"
+            ></b-icon>
           </div>
           <div>
             Verify code:
@@ -39,8 +44,8 @@
       <div class="content has-text-centered">
         <p>
           Welcome to
-          <strong>Splitastic</strong>!
-          <br />An app to split your chores and expenses.
+          <strong>Splitastic</strong>! <br />An app to split your chores and
+          expenses.
           <br />
           <br />
           <router-link :to="{ name: aboutRoute }">About</router-link>
@@ -58,7 +63,7 @@ import { Configuration } from "@/generated/api-axios/configuration";
 import {
   AutenticationApi,
   GeneralApi,
-  LoginData
+  LoginData,
 } from "@/generated/api-axios/api";
 import { RouterNames } from "@/untils/RouterNames";
 import { StateUtils } from "@/untils/StateUtils";
@@ -78,7 +83,7 @@ export default class Login extends Vue {
     let option = {};
     if (localStorage.getItem("admin.token")) {
       option = {
-        headers: { "X-ADMIN-TOKEN": localStorage.getItem("admin.token") }
+        headers: { "X-ADMIN-TOKEN": localStorage.getItem("admin.token") },
       };
     }
     this.loginData = (
@@ -134,7 +139,7 @@ export default class Login extends Vue {
     }
 
     const apiConfig: Configuration = {
-      basePath: config.basePath
+      basePath: config.basePath,
     };
 
     this.autenticationApi = new AutenticationApi(apiConfig);

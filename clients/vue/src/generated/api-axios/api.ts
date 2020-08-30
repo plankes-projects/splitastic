@@ -2928,6 +2928,53 @@ export const UserApiAxiosParamCreator = function (configuration?: Configuration)
         },
         /**
          * 
+         * @summary Links the firebase token to this user.
+         * @param {string} firebaseToken The firebase token of this device.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userFirebaseTokenPut: async (firebaseToken: string, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'firebaseToken' is not null or undefined
+            if (firebaseToken === null || firebaseToken === undefined) {
+                throw new RequiredError('firebaseToken','Required parameter firebaseToken was null or undefined when calling userFirebaseTokenPut.');
+            }
+            const localVarPath = `/user/firebaseToken`;
+            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuthHeader required
+            if (configuration && configuration.apiKey) {
+                const localVarApiKeyValue = typeof configuration.apiKey === 'function'
+                    ? await configuration.apiKey("X-API-KEY")
+                    : await configuration.apiKey;
+                localVarHeaderParameter["X-API-KEY"] = localVarApiKeyValue;
+            }
+
+            if (firebaseToken !== undefined) {
+                localVarQueryParameter['firebaseToken'] = firebaseToken;
+            }
+
+
+    
+            localVarUrlObj.query = {...localVarUrlObj.query, ...localVarQueryParameter, ...options.query};
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            const headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: globalImportUrl.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Returns user information of the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3142,6 +3189,20 @@ export const UserApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Links the firebase token to this user.
+         * @param {string} firebaseToken The firebase token of this device.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async userFirebaseTokenPut(firebaseToken: string, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await UserApiAxiosParamCreator(configuration).userFirebaseTokenPut(firebaseToken, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary Returns user information of the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3236,6 +3297,16 @@ export const UserApiFactory = function (configuration?: Configuration, basePath?
         },
         /**
          * 
+         * @summary Links the firebase token to this user.
+         * @param {string} firebaseToken The firebase token of this device.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        userFirebaseTokenPut(firebaseToken: string, options?: any): AxiosPromise<void> {
+            return UserApiFp(configuration).userFirebaseTokenPut(firebaseToken, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Returns user information of the current user.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3317,6 +3388,18 @@ export class UserApi extends BaseAPI {
      */
     public groupGroupIdUserUserIdDelete(groupId: number, userId: number, options?: any) {
         return UserApiFp(this.configuration).groupGroupIdUserUserIdDelete(groupId, userId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Links the firebase token to this user.
+     * @param {string} firebaseToken The firebase token of this device.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UserApi
+     */
+    public userFirebaseTokenPut(firebaseToken: string, options?: any) {
+        return UserApiFp(this.configuration).userFirebaseTokenPut(firebaseToken, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

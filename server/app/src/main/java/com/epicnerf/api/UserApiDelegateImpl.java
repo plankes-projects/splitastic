@@ -1,10 +1,8 @@
 package com.epicnerf.api;
 
+import com.epicnerf.exception.AuthenticationException;
 import com.epicnerf.hibernate.MapToOpenApiModel;
-import com.epicnerf.hibernate.dao.GroupInviteDao;
-import com.epicnerf.hibernate.dao.ImageDataDao;
-import com.epicnerf.hibernate.dao.NotificationDao;
-import com.epicnerf.hibernate.dao.UserDao;
+import com.epicnerf.hibernate.dao.*;
 import com.epicnerf.hibernate.model.GroupInvite;
 import com.epicnerf.hibernate.model.ImageData;
 import com.epicnerf.hibernate.repository.UserRepository;
@@ -43,6 +41,9 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     @Autowired
     private NotificationDao notificationDao;
 
+    @Autowired
+    private FirebaseTokenSupport firebaseTokenSupport;
+
     public ResponseEntity<User> userGet() {
         User u = openApiMapper.map(apiSupport.getCurrentUser());
         return ResponseEntity.ok(u);
@@ -72,6 +73,18 @@ public class UserApiDelegateImpl implements UserApiDelegate {
         com.epicnerf.hibernate.model.User u = apiSupport.getCurrentUser();
         u.setToken(UUID.randomUUID().toString());
         userRepository.save(u);
+        notificationDao.removeUserMapping(u);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    public ResponseEntity<Void> userFirebaseTokenPut(String firebaseToken) {
+        try {
+            com.epicnerf.hibernate.model.User user = apiSupport.getCurrentUser();
+            notificationDao.updateUserMapping(firebaseToken, user);
+        } catch (AuthenticationException e) {
+            firebaseTokenSupport.removeUserMapping(firebaseToken);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+
     }
 }
