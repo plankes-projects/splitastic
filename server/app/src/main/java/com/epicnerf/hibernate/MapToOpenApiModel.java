@@ -42,21 +42,6 @@ public class MapToOpenApiModel {
         return i;
     }
 
-    public List<Notification> map(List<com.epicnerf.hibernate.model.Notification> notifications) {
-        return notifications.stream()
-                .map(this::map)
-                .collect(Collectors.toList());
-    }
-
-    public Notification map(com.epicnerf.hibernate.model.Notification notification) {
-        return new Notification()
-                .tag(notification.getId().intValue())
-                .title(notification.getTitle())
-                .body(notification.getBody())
-                .data(notification.getData())
-                .timestamp(map(notification.getCreateDate()));
-    }
-
     public List<Group> map(List<GroupObject> groups, com.epicnerf.hibernate.model.User currentUser) {
         return groups.stream()
                 .map(group -> map(group, currentUser))

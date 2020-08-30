@@ -1,6 +1,5 @@
 package com.epicnerf.api;
 
-import com.epicnerf.exception.AuthenticationException;
 import com.epicnerf.hibernate.MapToOpenApiModel;
 import com.epicnerf.hibernate.dao.GroupInviteDao;
 import com.epicnerf.hibernate.dao.ImageDataDao;
@@ -10,7 +9,6 @@ import com.epicnerf.hibernate.model.GroupInvite;
 import com.epicnerf.hibernate.model.ImageData;
 import com.epicnerf.hibernate.repository.UserRepository;
 import com.epicnerf.model.Invite;
-import com.epicnerf.model.Notification;
 import com.epicnerf.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.NoResultException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -76,18 +73,5 @@ public class UserApiDelegateImpl implements UserApiDelegate {
         u.setToken(UUID.randomUUID().toString());
         userRepository.save(u);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    public ResponseEntity<List<Notification>> userNotificationsGet(String deviceId) {
-        List<Notification> notifications = new ArrayList<>();
-        try {
-            com.epicnerf.hibernate.model.User u = apiSupport.getCurrentUser();
-            notificationDao.updateUserMapping(deviceId, u);
-            notifications = openApiMapper.map(notificationDao.getAndDeleteNotifications(deviceId));
-        } catch (AuthenticationException e) {
-            notificationDao.removeUserMappingAndDeletePendingNotifications(deviceId);
-        }
-
-        return ResponseEntity.ok(notifications);
     }
 }
