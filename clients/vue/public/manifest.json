@@ -2,6 +2,7 @@
   "name": "Splitastic",
   "short_name": "Splitastic",
   "theme_color": "#4DBA87",
+  "gcm_sender_id": "103953800507",
   "icons": [
     {
       "src": "img/icons/manifest-icon-192.png",

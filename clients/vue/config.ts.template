@@ -1,4 +1,18 @@
 export default {
   basePath: "http://localhost:8081",
   aboutEmail: "email@domain.com",
+  firebase: {
+    config: {
+      apiKey: "xx",
+      authDomain: "xx",
+      databaseURL: "xx",
+      projectId: "xx",
+      storageBucket: "xx",
+      messagingSenderId: "xx",
+      appId: "xx",
+      measurementId: "xx",
+    },
+    publicVapidKey:
+      "xx",
+  },
 };

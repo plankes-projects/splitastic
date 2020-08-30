@@ -43,4 +43,17 @@ export class StateUtils {
   public static unsetApiKey() {
     localStorage.removeItem("apiKey");
   }
+
+  public static setFireBaseToken(fireBaseToken: string) {
+    localStorage.fireBaseToken = fireBaseToken;
+  }
+  public static getFireBaseToken(): string {
+    return localStorage.fireBaseToken;
+  }
+  public static hasFireBaseToken(): boolean {
+    return localStorage.fireBaseToken != undefined;
+  }
+  public static unsetFireBaseToken() {
+    localStorage.removeItem("fireBaseToken");
+  }
 }
