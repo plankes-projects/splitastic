@@ -39,17 +39,11 @@ export class NotificationUtils {
           event: any
         ) {
           console.log("foreground 2 notification clicked", event);
-          event.stopImmediatePropagation();
-          event.notification.close();
-          vue.$router.go(event.notification.data.FCM_MSG.data.url);
         });
         registration.addEventListener("notificationclick", function(
           event: any
         ) {
           console.log("foreground 3 notification clicked", event);
-          event.stopImmediatePropagation();
-          event.notification.close();
-          vue.$router.go(event.notification.data.FCM_MSG.data.url);
         });
         console.log("registration.showNotification");
         return registration.showNotification(notification.title, notification);
