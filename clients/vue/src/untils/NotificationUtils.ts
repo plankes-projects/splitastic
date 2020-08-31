@@ -10,11 +10,13 @@ export class NotificationUtils {
     const messaging = firebase.messaging();
     messaging.usePublicVapidKey(config.firebase.publicVapidKey);
     messaging.onMessage((payload) => {
+      console.log("push foreground received: ", payload);
       const notification = new Notification(
         payload.notification.title,
         payload.notification
       );
       notification.onclick = function(event: any) {
+        console.log("push foreground clicked: ", event);
         notification.close();
         const data = JSON.parse(payload.data.data);
         vue.$router.go(data.url);
