@@ -34,10 +34,8 @@ export class NotificationUtils {
 
   public static showMessage(notification: any, vue: Vue) {
     if (Notification.permission == "granted") {
-      console.log("showMessage");
       return navigator.serviceWorker.ready.then((registration) => {
-        console.log("addEventListener");
-        registration.active?.addEventListener("notificationclick 2", function(
+        registration.active?.addEventListener("notificationclick", function(
           event: any
         ) {
           console.log("foreground notification clicked", event);
