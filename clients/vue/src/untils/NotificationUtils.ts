@@ -11,41 +11,27 @@ export class NotificationUtils {
     messaging.usePublicVapidKey(config.firebase.publicVapidKey);
     messaging.onMessage((payload) => {
       console.log("push foreground received: ", payload);
-      this.showMessage(payload.notification, vue);
+      const notification = new Notification(
+        payload.notification.title,
+        payload.notification
+      );
+      notification.onclick = function(event: any) {
+        console.log("push foreground clicked: ", event);
+        notification.close();
+        const data = JSON.parse(payload.data.data);
+        vue.$router.go(data.url);
+      };
     });
 
     this.refreshFirebaseToken();
     messaging.onTokenRefresh(() => {
       return this.refreshFirebaseToken();
     });
-
-    navigator.serviceWorker.ready.then((registration) => {
-      return registration.active?.addEventListener(
-        "notificationclick",
-        function(event: any) {
-          console.log("foreground notification clicked", event);
-          event.stopImmediatePropagation();
-          event.notification.close();
-          vue.$router.go(event.notification.data.FCM_MSG.data.url);
-        }
-      );
-    });
   }
 
-  public static showMessage(notification: any, vue: Vue) {
+  public static showMessage(notification: any) {
     if (Notification.permission == "granted") {
       return navigator.serviceWorker.ready.then((registration) => {
-        registration.active?.addEventListener("notificationclick", function(
-          event: any
-        ) {
-          console.log("foreground 2 notification clicked", event);
-        });
-        registration.addEventListener("notificationclick", function(
-          event: any
-        ) {
-          console.log("foreground 3 notification clicked", event);
-        });
-        console.log("registration.showNotification");
         return registration.showNotification(notification.title, notification);
       });
     }
