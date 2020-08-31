@@ -6,17 +6,6 @@ import { StateUtils } from "./StateUtils";
 
 export class NotificationUtils {
   public static init(vue: Vue) {
-    navigator.serviceWorker.ready.then((registration) => {
-      return registration.addEventListener("notificationclick", function(
-        event: any
-      ) {
-        console.log("foreground notification clicked", event);
-        event.stopImmediatePropagation();
-        event.notification.close();
-        vue.$router.go(event.notification.data.FCM_MSG.data.url);
-      });
-    });
-
     firebase.initializeApp(config.firebase.config);
     const messaging = firebase.messaging();
     messaging.usePublicVapidKey(config.firebase.publicVapidKey);
@@ -28,6 +17,17 @@ export class NotificationUtils {
     this.refreshFirebaseToken();
     messaging.onTokenRefresh(() => {
       return this.refreshFirebaseToken();
+    });
+
+    navigator.serviceWorker.ready.then((registration) => {
+      return registration.addEventListener("notificationclick", function(
+        event: any
+      ) {
+        console.log("foreground notification clicked", event);
+        event.stopImmediatePropagation();
+        event.notification.close();
+        vue.$router.go(event.notification.data.FCM_MSG.data.url);
+      });
     });
   }
 
