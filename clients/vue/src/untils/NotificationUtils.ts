@@ -6,31 +6,7 @@ import { StateUtils } from "./StateUtils";
 
 export class NotificationUtils {
   public static init(vue: Vue) {
-    firebase.initializeApp(config.firebase.config);
-    const messaging = firebase.messaging();
-    messaging.usePublicVapidKey(config.firebase.publicVapidKey);
-    messaging.onMessage((payload) => {
-      console.log("push foreground received: ", payload);
-      this.showMessage(payload.notification);
-
-      const notification = new Notification(
-        payload.notification.title,
-        payload.notification
-      );
-      notification.onclick = function(event: any) {
-        console.log("push foreground clicked: ", event);
-        notification.close();
-        const data = JSON.parse(payload.data.data);
-        vue.$router.go(data.url);
-      };
-    });
-
-    this.refreshFirebaseToken();
-    messaging.onTokenRefresh(() => {
-      return this.refreshFirebaseToken();
-    });
-
-    return navigator.serviceWorker.ready.then((registration) => {
+    navigator.serviceWorker.ready.then((registration) => {
       return registration.addEventListener("notificationclick", function(
         event: any
       ) {
@@ -39,6 +15,19 @@ export class NotificationUtils {
         event.notification.close();
         vue.$router.go(event.notification.data.FCM_MSG.data.url);
       });
+    });
+
+    firebase.initializeApp(config.firebase.config);
+    const messaging = firebase.messaging();
+    messaging.usePublicVapidKey(config.firebase.publicVapidKey);
+    messaging.onMessage((payload) => {
+      console.log("push foreground received: ", payload);
+      this.showMessage(payload.notification);
+    });
+
+    this.refreshFirebaseToken();
+    messaging.onTokenRefresh(() => {
+      return this.refreshFirebaseToken();
     });
   }
 
