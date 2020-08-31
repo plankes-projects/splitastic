@@ -10,15 +10,21 @@ export class NotificationUtils {
     const messaging = firebase.messaging();
     messaging.usePublicVapidKey(config.firebase.publicVapidKey);
     messaging.onMessage((payload) => {
-      const notification = new Notification(
-        payload.notification.title,
-        payload.notification
-      );
-      notification.onclick = function(event: any) {
-        notification.close();
-        const data = JSON.parse(payload.data.data);
-        vue.$router.go(data.url);
-      };
+      console.log("push foreground received: ", payload);
+      try {
+        const notification = new Notification(
+          payload.notification.title,
+          payload.notification
+        );
+        notification.onclick = function(event: any) {
+          console.log("push foreground clicked: ", event);
+          notification.close();
+          vue.$router.go(payload.data.url);
+        };
+      } catch (err) {
+        //todo: how to add on click listener?
+        this.showMessage(payload.notification); //android fallback
+      }
     });
 
     this.refreshFirebaseToken();
@@ -29,8 +35,8 @@ export class NotificationUtils {
 
   public static showMessage(notification: any) {
     if (Notification.permission == "granted") {
-      return navigator.serviceWorker.ready.then((registration) => {
-        return registration.showNotification(notification.title, notification);
+      navigator.serviceWorker.ready.then((registration) => {
+        registration.showNotification(notification.title, notification);
       });
     }
   }
