@@ -18,8 +18,7 @@ export class NotificationUtils {
       notification.onclick = function(event: any) {
         console.log("push foreground clicked: ", event);
         notification.close();
-        const data = JSON.parse(payload.data.data);
-        vue.$router.go(data.url);
+        vue.$router.go(payload.data.url);
       };
     });
 
