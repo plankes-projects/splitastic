@@ -11,7 +11,7 @@ export class NotificationUtils {
     messaging.usePublicVapidKey(config.firebase.publicVapidKey);
     messaging.onMessage((payload) => {
       console.log("push foreground received: ", payload);
-      this.showMessage(payload.notification);
+      this.showMessage(payload.notification, vue);
     });
 
     this.refreshFirebaseToken();
@@ -32,9 +32,17 @@ export class NotificationUtils {
     });
   }
 
-  public static showMessage(notification: any) {
+  public static showMessage(notification: any, vue: Vue) {
     if (Notification.permission == "granted") {
       return navigator.serviceWorker.ready.then((registration) => {
+        registration.active?.addEventListener("notificationclick 2", function(
+          event: any
+        ) {
+          console.log("foreground notification clicked", event);
+          event.stopImmediatePropagation();
+          event.notification.close();
+          vue.$router.go(event.notification.data.FCM_MSG.data.url);
+        });
         return registration.showNotification(notification.title, notification);
       });
     }
