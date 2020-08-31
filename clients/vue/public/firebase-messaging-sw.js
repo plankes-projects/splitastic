@@ -22,5 +22,6 @@ firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log("[firebase-messaging-sw.js] onBackgroundMessage", payload);
+  return self.registration.showNotification(payload.data.title, payload.data);
 });
 // [END initialize_firebase_in_sw]
