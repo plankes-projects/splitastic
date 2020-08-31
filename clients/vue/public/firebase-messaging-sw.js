@@ -1,5 +1,6 @@
 // [START initialize_firebase_in_sw]
 self.addEventListener("notificationclick", function(event) {
+  console.log("background notification clicked", event);
   event.stopImmediatePropagation();
   event.notification.close();
   clients.openWindow(event.notification.data.FCM_MSG.data.url);

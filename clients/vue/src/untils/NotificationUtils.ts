@@ -10,9 +10,9 @@ export class NotificationUtils {
     const messaging = firebase.messaging();
     messaging.usePublicVapidKey(config.firebase.publicVapidKey);
     messaging.onMessage((payload) => {
+      console.log("push foreground received: ", payload);
       this.showMessage(payload.notification);
 
-      console.log("push foreground received: ", payload);
       const notification = new Notification(
         payload.notification.title,
         payload.notification
@@ -28,6 +28,17 @@ export class NotificationUtils {
     this.refreshFirebaseToken();
     messaging.onTokenRefresh(() => {
       return this.refreshFirebaseToken();
+    });
+
+    return navigator.serviceWorker.ready.then((registration) => {
+      return registration.addEventListener("notificationclick", function(
+        event: any
+      ) {
+        console.log("foreground notification clicked", event);
+        event.stopImmediatePropagation();
+        event.notification.close();
+        vue.$router.go(event.notification.data.FCM_MSG.data.url);
+      });
     });
   }
 
