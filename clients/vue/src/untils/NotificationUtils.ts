@@ -34,7 +34,9 @@ export class NotificationUtils {
 
   public static showMessage(notification: any, vue: Vue) {
     if (Notification.permission == "granted") {
+      console.log("showMessage");
       return navigator.serviceWorker.ready.then((registration) => {
+        console.log("addEventListener");
         registration.active?.addEventListener("notificationclick 2", function(
           event: any
         ) {
@@ -43,6 +45,7 @@ export class NotificationUtils {
           event.notification.close();
           vue.$router.go(event.notification.data.FCM_MSG.data.url);
         });
+        console.log("registration.showNotification");
         return registration.showNotification(notification.title, notification);
       });
     }
