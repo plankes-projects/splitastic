@@ -55,10 +55,17 @@ public class PushNotificationServiceImpl implements PushNotificationService {
         httpHeaders.set("Authorization", "key=" + firebaseServerKey);
         httpHeaders.set("Content-Type", "application/json");
 
+        JSONObject headers = new JSONObject();
+        headers.put("TTL", 86400);
+
+        JSONObject webpush = new JSONObject();
+        webpush.put("headers", headers);
+
         JSONObject json = new JSONObject();
         json.put("data", message);
         json.put("notification", message);
         json.put("to", receiverFcmKey);
+        json.put("webpush", webpush);
 
         HttpEntity<String> httpEntity = new HttpEntity<>(json.toString(), httpHeaders);
         return restTemplate.postForObject(firebaseApiUrl, httpEntity, String.class);
