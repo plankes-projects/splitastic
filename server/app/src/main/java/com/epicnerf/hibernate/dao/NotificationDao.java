@@ -1,10 +1,11 @@
 package com.epicnerf.hibernate.dao;
 
-import com.epicnerf.api.NotificationManager;
+import com.epicnerf.databean.NotificationRoutingInfo;
 import com.epicnerf.hibernate.model.Device;
 import com.epicnerf.hibernate.model.GroupObject;
 import com.epicnerf.hibernate.model.User;
 import com.epicnerf.hibernate.repository.DeviceRepository;
+import com.epicnerf.service.NotificationManager;
 import com.epicnerf.service.PushNotificationService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,14 +77,14 @@ public class NotificationDao {
         notificationManager.onNewDeviceLink(user, device);
     }
 
-    public void insertForAllUsersOfGroup(@NonNull String title, @NonNull String body, @NonNull GroupObject group) {
-        insertForAllUsersOfGroup(title, body, group, new ArrayList<>());
+    public void insertForAllUsersOfGroup(@NonNull NotificationRoutingInfo info, @NonNull String title, @NonNull String body, @NonNull GroupObject group) {
+        insertForAllUsersOfGroup(info, title, body, group, new ArrayList<>());
     }
 
-    public void insertForAllUsersOfGroup(@NonNull String title, @NonNull String body, @NonNull GroupObject group, @NonNull List<User> exceptions) {
+    public void insertForAllUsersOfGroup(@NonNull NotificationRoutingInfo info, @NonNull String title, @NonNull String body, @NonNull GroupObject group, @NonNull List<User> exceptions) {
         for (User userInGroup : group.getUsers()) {
             if (!isException(userInGroup, exceptions)) {
-                this.insertForAllDevicesOfUser(title, body, userInGroup);
+                this.insertForAllDevicesOfUser(info, title, body, userInGroup);
             }
         }
     }
@@ -105,7 +106,7 @@ public class NotificationDao {
                 .getResultList();
     }
 
-    public void insertForAllDevicesOfUser(@NonNull String title, @NonNull String body, @NonNull User user, @NonNull List<Device> exceptions) {
+    public void insertForAllDevicesOfUser(@NonNull NotificationRoutingInfo info, @NonNull String title, @NonNull String body, @NonNull User user, @NonNull List<Device> exceptions) {
         List<String> keys = getAllDevicesOfUser(user)
                 .stream()
                 .filter(device -> !isException(device, exceptions))
@@ -114,11 +115,11 @@ public class NotificationDao {
 
         title = StringUtils.abbreviate(title, 65);
         body = StringUtils.abbreviate(body, 240);
-        pushNotificationService.sendPushNotification(keys, title, body);
+        pushNotificationService.sendPushNotification(info, keys, title, body);
     }
 
-    public void insertForAllDevicesOfUser(@NonNull String title, @NonNull String body, @NonNull User user) {
-        insertForAllDevicesOfUser(title, body, user, new ArrayList<>());
+    public void insertForAllDevicesOfUser(@NonNull NotificationRoutingInfo info, @NonNull String title, @NonNull String body, @NonNull User user) {
+        insertForAllDevicesOfUser(info, title, body, user, new ArrayList<>());
     }
 
     private boolean isException(@NonNull Device device, @NonNull List<Device> exceptions) {

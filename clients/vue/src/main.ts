@@ -24,10 +24,10 @@ Vue.config.errorHandler = function(err, vm, info) {
 };
 
 Vue.config.productionTip = false;
-new Vue({
+const vue = new Vue({
   router,
   store,
   render: (h) => h(App),
 }).$mount("#app");
 
-NotificationUtils.init();
+NotificationUtils.init(vue);
