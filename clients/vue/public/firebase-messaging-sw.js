@@ -20,9 +20,6 @@ firebase.initializeApp(firebaseConfig);
 
 // Retrieve an instance of Firebase Messaging so that it can handle background messages.
 const messaging = firebase.messaging();
-messaging.onMessage((payload) => {
-  console.log("[firebase-messaging-sw.js] onMessage", payload);
-});
 messaging.onBackgroundMessage((payload) => {
   console.log("[firebase-messaging-sw.js] onBackgroundMessage", payload);
 });
