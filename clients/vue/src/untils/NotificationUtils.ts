@@ -10,6 +10,8 @@ export class NotificationUtils {
     const messaging = firebase.messaging();
     messaging.usePublicVapidKey(config.firebase.publicVapidKey);
     messaging.onMessage((payload) => {
+      this.showMessage(payload.notification);
+
       console.log("push foreground received: ", payload);
       const notification = new Notification(
         payload.notification.title,
