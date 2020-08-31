@@ -44,7 +44,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
     public String toClientUrl(@NonNull NotificationRoutingInfo info) {
         String url = "/";
         if (info.groupId != null) {
-            url += "group/30/" + (info.view == ClientView.CHORE ? "chore" : "finance");
+            url += "group/" + info.groupId + "/" + (info.view == ClientView.CHORE ? "chore" : "finance");
         }
         return url;
     }
