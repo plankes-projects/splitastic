@@ -6,6 +6,7 @@ import com.epicnerf.hibernate.model.FinanceEntry;
 import com.epicnerf.hibernate.model.User;
 import com.epicnerf.hibernate.repository.FinanceRepository;
 import com.epicnerf.model.FinanceEntryEntry;
+import com.epicnerf.service.NotificationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

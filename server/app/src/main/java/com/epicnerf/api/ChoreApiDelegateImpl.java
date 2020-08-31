@@ -10,6 +10,7 @@ import com.epicnerf.hibernate.repository.ChoreEntryRepository;
 import com.epicnerf.hibernate.repository.ChoreRepository;
 import com.epicnerf.hibernate.repository.GroupObjectRepository;
 import com.epicnerf.model.ChoreSummary;
+import com.epicnerf.service.NotificationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

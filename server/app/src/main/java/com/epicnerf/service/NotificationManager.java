@@ -1,5 +1,7 @@
-package com.epicnerf.api;
+package com.epicnerf.service;
 
+import com.epicnerf.databean.NotificationRoutingInfo;
+import com.epicnerf.enums.ClientView;
 import com.epicnerf.hibernate.dao.NotificationDao;
 import com.epicnerf.hibernate.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,8 @@ public class NotificationManager {
                     String body = "Group: " + entry.getGroup().getName() +
                             "\nTitle: " + entry.getTitle() +
                             "\nYou own " + decimalFormat.format(moneyOwned) + "€ less to " + entry.getSpentFrom().getName();
-                    notificationDao.insertForAllDevicesOfUser(title, body, userInGroup);
+                    NotificationRoutingInfo info = new NotificationRoutingInfo(entry.getGroup().getId(), ClientView.FINANCE);
+                    notificationDao.insertForAllDevicesOfUser(info, title, body, userInGroup);
                 }
             }
         }
@@ -45,7 +48,8 @@ public class NotificationManager {
                     String body = "Group: " + entry.getGroup().getName() +
                             "\nTitle: " + entry.getTitle() +
                             "\nYou own " + decimalFormat.format(moneyOwned) + "€ to " + entry.getSpentFrom().getName();
-                    notificationDao.insertForAllDevicesOfUser(title, body, userInGroup);
+                    NotificationRoutingInfo info = new NotificationRoutingInfo(entry.getGroup().getId(), ClientView.FINANCE);
+                    notificationDao.insertForAllDevicesOfUser(info, title, body, userInGroup);
                 }
             }
         }
@@ -60,7 +64,8 @@ public class NotificationManager {
                     "\nTitle: " + entry.getTitle() +
                     "\nWho added: " + entry.getCreatedBy().getName() +
                     "\nTotal: " + decimalFormat.format(total) + "€";
-            notificationDao.insertForAllDevicesOfUser(title, body, entry.getSpentFrom());
+            NotificationRoutingInfo info = new NotificationRoutingInfo(entry.getGroup().getId(), ClientView.FINANCE);
+            notificationDao.insertForAllDevicesOfUser(info, title, body, entry.getSpentFrom());
         }
     }
 
@@ -78,7 +83,8 @@ public class NotificationManager {
         String body = "Group: " + chore.getGroup().getName() +
                 "\nChore: " + chore.getTitle();
 
-        notificationDao.insertForAllUsersOfGroup(title, body, chore.getGroup(), Collections.singletonList(user));
+        NotificationRoutingInfo info = new NotificationRoutingInfo(chore.getGroup().getId(), ClientView.CHORE);
+        notificationDao.insertForAllUsersOfGroup(info, title, body, chore.getGroup(), Collections.singletonList(user));
     }
 
     public void onChoreAdded(User user, Chore chore) {
@@ -86,7 +92,8 @@ public class NotificationManager {
         String body = "Group: " + chore.getGroup().getName() +
                 "\nChore: " + chore.getTitle();
 
-        notificationDao.insertForAllUsersOfGroup(title, body, chore.getGroup(), Collections.singletonList(user));
+        NotificationRoutingInfo info = new NotificationRoutingInfo(chore.getGroup().getId(), ClientView.CHORE);
+        notificationDao.insertForAllUsersOfGroup(info, title, body, chore.getGroup(), Collections.singletonList(user));
     }
 
     public void onChoreEntryDeleted(User user, Chore chore) {
@@ -95,7 +102,8 @@ public class NotificationManager {
                 "\nChore: " + chore.getTitle() +
                 "\nUser: " + user.getName();
 
-        notificationDao.insertForAllUsersOfGroup(title, body, chore.getGroup(), Collections.singletonList(user));
+        NotificationRoutingInfo info = new NotificationRoutingInfo(chore.getGroup().getId(), ClientView.CHORE);
+        notificationDao.insertForAllUsersOfGroup(info, title, body, chore.getGroup(), Collections.singletonList(user));
     }
 
     public void onChoreEntryAdded(User user, Chore chore) {
@@ -104,26 +112,30 @@ public class NotificationManager {
                 "\nChore: " + chore.getTitle() +
                 "\nUser: " + user.getName();
 
-        notificationDao.insertForAllUsersOfGroup(title, body, chore.getGroup(), Collections.singletonList(user));
+        NotificationRoutingInfo info = new NotificationRoutingInfo(chore.getGroup().getId(), ClientView.CHORE);
+        notificationDao.insertForAllUsersOfGroup(info, title, body, chore.getGroup(), Collections.singletonList(user));
     }
 
     public void onNewDeviceLink(User user, Device device) {
         String title = "New device registered";
         String body = "";
-        notificationDao.insertForAllDevicesOfUser(title, body, user, Collections.singletonList(device));
+        NotificationRoutingInfo info = new NotificationRoutingInfo(null, null);
+        notificationDao.insertForAllDevicesOfUser(info, title, body, user, Collections.singletonList(device));
     }
 
     public void onGroupDelete(User user, GroupObject group) {
         String title = "Group deleted";
         String body = "Group: " + group.getName();
 
-        notificationDao.insertForAllUsersOfGroup(title, body, group, Collections.singletonList(user));
+        NotificationRoutingInfo info = new NotificationRoutingInfo(null, null);
+        notificationDao.insertForAllUsersOfGroup(info, title, body, group, Collections.singletonList(user));
     }
 
     public void onGroupInviteSent(GroupInvite groupInvite) {
         String title = "New group invite";
         String body = "Group: " + groupInvite.getGroup().getName();
-        notificationDao.insertForAllDevicesOfUser(title, body, groupInvite.getInvitedUser());
+        NotificationRoutingInfo info = new NotificationRoutingInfo(groupInvite.getGroup().getId(), ClientView.FINANCE);
+        notificationDao.insertForAllDevicesOfUser(info, title, body, groupInvite.getInvitedUser());
     }
 
     public void onGroupInviteDeleted(User user, GroupInvite groupInvite) {
@@ -131,11 +143,13 @@ public class NotificationManager {
             String title = "Group invite rejected";
             String body = "Group: " + groupInvite.getGroup().getName() +
                     "\nEmail: " + groupInvite.getInvitedUser().getEmail();
-            notificationDao.insertForAllDevicesOfUser(title, body, groupInvite.getGroup().getOwner());
+            NotificationRoutingInfo info = new NotificationRoutingInfo(groupInvite.getGroup().getId(), ClientView.FINANCE);
+            notificationDao.insertForAllDevicesOfUser(info, title, body, groupInvite.getGroup().getOwner());
         } else {
             String title = "Group invite withdrawn";
             String body = "Group: " + groupInvite.getGroup().getName();
-            notificationDao.insertForAllDevicesOfUser(title, body, groupInvite.getInvitedUser());
+            NotificationRoutingInfo info = new NotificationRoutingInfo(null, null);
+            notificationDao.insertForAllDevicesOfUser(info, title, body, groupInvite.getInvitedUser());
         }
     }
 
@@ -147,7 +161,8 @@ public class NotificationManager {
         String title = "User joined group";
         String body = "Group: " + groupInvite.getGroup().getName() +
                 "\nUser: " + groupInvite.getInvitedUser().getName();
-        notificationDao.insertForAllUsersOfGroup(title, body, groupInvite.getGroup(), Collections.singletonList(groupInvite.getInvitedUser()));
+        NotificationRoutingInfo info = new NotificationRoutingInfo(groupInvite.getGroup().getId(), ClientView.FINANCE);
+        notificationDao.insertForAllUsersOfGroup(info, title, body, groupInvite.getGroup(), Collections.singletonList(groupInvite.getInvitedUser()));
     }
 
     public void onGroupLeft(User user, GroupObject group, User userLeft) {
@@ -156,7 +171,8 @@ public class NotificationManager {
                 "\nUser: " + userLeft.getName();
 
         User userToIgnore = user.getId().equals(userLeft.getId()) ? userLeft : group.getOwner();
-        notificationDao.insertForAllUsersOfGroup(title, body, group, Collections.singletonList(userToIgnore));
+        NotificationRoutingInfo info = new NotificationRoutingInfo(group.getId(), ClientView.FINANCE);
+        notificationDao.insertForAllUsersOfGroup(info, title, body, group, Collections.singletonList(userToIgnore));
     }
 
     public void onVirtualUserJoined(GroupObject group, User virtualUser) {
@@ -164,6 +180,7 @@ public class NotificationManager {
         String body = "Group: " + group.getName() +
                 "\nUser: " + virtualUser.getName();
 
-        notificationDao.insertForAllUsersOfGroup(title, body, group);
+        NotificationRoutingInfo info = new NotificationRoutingInfo(group.getId(), ClientView.FINANCE);
+        notificationDao.insertForAllUsersOfGroup(info, title, body, group);
     }
 }

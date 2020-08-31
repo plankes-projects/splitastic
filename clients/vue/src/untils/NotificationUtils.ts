@@ -5,12 +5,20 @@ import { UserApi } from "@/generated/api-axios";
 import { StateUtils } from "./StateUtils";
 
 export class NotificationUtils {
-  public static init() {
+  public static init(vue: Vue) {
     firebase.initializeApp(config.firebase.config);
     const messaging = firebase.messaging();
     messaging.usePublicVapidKey(config.firebase.publicVapidKey);
-    messaging.onMessage((notification) => {
-      this.showMessage(notification.notification);
+    messaging.onMessage((payload) => {
+      const notification = new Notification(
+        payload.notification.title,
+        payload.notification
+      );
+      notification.onclick = function(event: any) {
+        notification.close();
+        const data = JSON.parse(payload.data.data);
+        vue.$router.go(data.url);
+      };
     });
 
     this.refreshFirebaseToken();

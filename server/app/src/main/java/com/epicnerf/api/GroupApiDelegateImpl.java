@@ -12,6 +12,7 @@ import com.epicnerf.hibernate.repository.GroupInviteRepository;
 import com.epicnerf.hibernate.repository.GroupObjectRepository;
 import com.epicnerf.hibernate.repository.UserRepository;
 import com.epicnerf.model.*;
+import com.epicnerf.service.NotificationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
