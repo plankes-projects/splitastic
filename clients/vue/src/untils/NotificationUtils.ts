@@ -20,14 +20,15 @@ export class NotificationUtils {
     });
 
     navigator.serviceWorker.ready.then((registration) => {
-      return registration.addEventListener("notificationclick", function(
-        event: any
-      ) {
-        console.log("foreground notification clicked", event);
-        event.stopImmediatePropagation();
-        event.notification.close();
-        vue.$router.go(event.notification.data.FCM_MSG.data.url);
-      });
+      return registration.active?.addEventListener(
+        "notificationclick",
+        function(event: any) {
+          console.log("foreground notification clicked", event);
+          event.stopImmediatePropagation();
+          event.notification.close();
+          vue.$router.go(event.notification.data.FCM_MSG.data.url);
+        }
+      );
     });
   }
 
