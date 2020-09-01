@@ -27,6 +27,15 @@ export class NotificationUtils {
       }
     });
 
+    navigator.serviceWorker
+      .register(`${process.env.BASE_URL}firebase-messaging-sw.js`)
+      .then((registration) => {
+        messaging.useServiceWorker(registration);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     this.refreshFirebaseToken();
     messaging.onTokenRefresh(() => {
       return this.refreshFirebaseToken();
