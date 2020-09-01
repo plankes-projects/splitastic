@@ -27,6 +27,15 @@ export class NotificationUtils {
       }
     });
 
+    window.addEventListener(
+      "notificationclick",
+      function(event) {
+        event.stopPropagation();
+        console.log("notificationclick intercepted!");
+      },
+      true
+    );
+
     this.refreshFirebaseToken();
     messaging.onTokenRefresh(() => {
       return this.refreshFirebaseToken();
