@@ -11,19 +11,21 @@ export class NotificationUtils {
     messaging.usePublicVapidKey(config.firebase.publicVapidKey);
     messaging.onMessage((payload) => {
       console.log("push foreground received: ", payload);
-
-      //todo: how to add on click listener?
-      this.showMessage(payload.notification); //android fallback
+      try {
+        const notification = new Notification(
+          payload.notification.title,
+          payload.notification
+        );
+        notification.onclick = function(event: any) {
+          console.log("push foreground clicked: ", event);
+          notification.close();
+          vue.$router.go(payload.data.url);
+        };
+      } catch (err) {
+        //todo: how to add on click listener?
+        this.showMessage(payload.notification); //android fallback
+      }
     });
-
-    window.addEventListener(
-      "notificationclick",
-      function(event) {
-        event.stopPropagation();
-        console.log("notificationclick intercepted!");
-      },
-      true
-    );
 
     this.refreshFirebaseToken();
     messaging.onTokenRefresh(() => {
