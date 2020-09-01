@@ -40,6 +40,33 @@ export class NotificationUtils {
         });
       });
 
+    navigator.serviceWorker
+      .register(`${process.env.BASE_URL}service-worker.js`)
+      .then((registration) => {
+        console.log("Registering click listener");
+        registration.addEventListener("notificationclick", (e) => {
+          console.log("Click event 3!", e);
+        });
+
+        registration.active!.addEventListener("notificationclick", (e) => {
+          console.log("Click event 4!", e);
+        });
+      });
+
+    navigator.serviceWorker.addEventListener("notificationclick", (e) => {
+      console.log("Click event 5!", e);
+    });
+    navigator.serviceWorker.ready.then((registration) => {
+      console.log("Registering click listener 2");
+      registration.addEventListener("notificationclick", (e) => {
+        console.log("Click event 6!", e);
+      });
+
+      registration.active!.addEventListener("notificationclick", (e) => {
+        console.log("Click event 7!", e);
+      });
+    });
+
     this.refreshFirebaseToken();
     messaging.onTokenRefresh(() => {
       return this.refreshFirebaseToken();
