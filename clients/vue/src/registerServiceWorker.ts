@@ -5,7 +5,16 @@ import { register } from "register-service-worker";
 if (process.env.NODE_ENV === "production") {
   //register(`${process.env.BASE_URL}firebase-messaging-sw.js`);
   register(`${process.env.BASE_URL}service-worker.js`, {
-    ready() {
+    ready(registration) {
+      console.log("Registering click listener");
+      registration.addEventListener("notificationclick", (e) => {
+        console.log("Click event 3!", e);
+      });
+
+      registration.active!.addEventListener("notificationclick", (e) => {
+        console.log("Click event 4!", e);
+      });
+
       console.log(
         "App is being served from cache by a service worker.\n" +
           "For more details, visit https://goo.gl/AFskqB"
