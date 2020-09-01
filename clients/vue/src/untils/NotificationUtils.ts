@@ -11,20 +11,8 @@ export class NotificationUtils {
     messaging.usePublicVapidKey(config.firebase.publicVapidKey);
     messaging.onMessage((payload) => {
       console.log("push foreground received: ", payload);
-      try {
-        const notification = new Notification(
-          payload.notification.title,
-          payload.notification
-        );
-        notification.onclick = function(event: any) {
-          console.log("push foreground clicked: ", event);
-          notification.close();
-          vue.$router.go(payload.data.url);
-        };
-      } catch (err) {
-        //todo: how to add on click listener?
-        this.showMessage(payload.notification); //android fallback
-      }
+
+      this.showMessage(payload.notification); //android fallback
     });
 
     navigator.serviceWorker
