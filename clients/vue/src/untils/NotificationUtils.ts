@@ -27,6 +27,19 @@ export class NotificationUtils {
       }
     });
 
+    navigator.serviceWorker
+      .register(`${process.env.BASE_URL}firebase-messaging-sw.js`)
+      .then((registration) => {
+        console.log("Registering click listener");
+        registration.addEventListener("notificationclick", (e) => {
+          console.log("Click event 1!", e);
+        });
+
+        registration.active!.addEventListener("notificationclick", (e) => {
+          console.log("Click event 2!", e);
+        });
+      });
+
     this.refreshFirebaseToken();
     messaging.onTokenRefresh(() => {
       return this.refreshFirebaseToken();
