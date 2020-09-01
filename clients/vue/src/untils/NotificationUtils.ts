@@ -11,48 +11,20 @@ export class NotificationUtils {
     messaging.usePublicVapidKey(config.firebase.publicVapidKey);
     messaging.onMessage((payload) => {
       console.log("push foreground received: ", payload);
-
-      this.showMessage(payload.notification); //android fallback
-    });
-
-    navigator.serviceWorker
-      .register(`${process.env.BASE_URL}firebase-messaging-sw.js`)
-      .then((registration) => {
-        console.log("Registering click listener");
-        registration.addEventListener("notificationclick", (e) => {
-          console.log("Click event 1!", e);
-        });
-
-        registration.active!.addEventListener("notificationclick", (e) => {
-          console.log("Click event 2!", e);
-        });
-      });
-
-    navigator.serviceWorker
-      .register(`${process.env.BASE_URL}service-worker.js`)
-      .then((registration) => {
-        console.log("Registering click listener");
-        registration.addEventListener("notificationclick", (e) => {
-          console.log("Click event 3!", e);
-        });
-
-        registration.active!.addEventListener("notificationclick", (e) => {
-          console.log("Click event 4!", e);
-        });
-      });
-
-    navigator.serviceWorker.addEventListener("notificationclick", (e) => {
-      console.log("Click event 5!", e);
-    });
-    navigator.serviceWorker.ready.then((registration) => {
-      console.log("Registering click listener 2");
-      registration.addEventListener("notificationclick", (e) => {
-        console.log("Click event 6!", e);
-      });
-
-      registration.active!.addEventListener("notificationclick", (e) => {
-        console.log("Click event 7!", e);
-      });
+      try {
+        const notification = new Notification(
+          payload.notification.title,
+          payload.notification
+        );
+        notification.onclick = function(event: any) {
+          console.log("push foreground clicked: ", event);
+          notification.close();
+          vue.$router.go(payload.data.url);
+        };
+      } catch (err) {
+        //todo: how to add on click listener?
+        this.showMessage(payload.notification); //android fallback
+      }
     });
 
     this.refreshFirebaseToken();
