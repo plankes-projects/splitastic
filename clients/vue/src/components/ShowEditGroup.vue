@@ -255,13 +255,28 @@ export default class ShowEditGroup extends Vue {
       apiKey: StateUtils.getApiKey()
     });
     try {
+      const countBeforeUserDelete = this.group.users!.length;
       this.loading = true;
       await api.groupGroupIdUserUserIdDelete(Number(this.group.id), userId);
       if (isLeave) {
         StateUtils.unsetActiveGroupId();
         this.$router.push({ name: RouterNames.HOME });
       } else {
-        this.refresh();
+        await this.refresh();
+        const countAfterUserDelete = this.group.users!.length;
+        if (countBeforeUserDelete == countAfterUserDelete) {
+          this.$buefy.toast.open({
+            duration: 3000,
+            message: `A ghost of this user is still here because he has entries in the group.`,
+            type: "is-danger"
+          });
+        } else {
+          this.$buefy.toast.open({
+            duration: 1000,
+            message: `User deleted`,
+            type: "is-success"
+          });
+        }
       }
     } catch (e) {
       this.loading = false;

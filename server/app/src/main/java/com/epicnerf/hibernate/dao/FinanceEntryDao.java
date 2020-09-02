@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
+import java.math.BigInteger;
 import java.util.List;
 
 @Component
@@ -74,6 +75,29 @@ public class FinanceEntryDao {
                 .setParameter("fromUserId", fromUserId)
                 .setParameter("toUserId", toUserId)
                 .executeUpdate();
+    }
+
+    public boolean hasFinanceData(int groupId, int userId) {
+        String query = "SELECT EXISTS(select * from finance_entry where group_id = :groupId and ";
+        query += " (created_by_id = :userId or spent_from_id = :userId))";
+        BigInteger exists = (BigInteger) entityManager
+                .createNativeQuery(query)
+                .setParameter("groupId", groupId)
+                .setParameter("userId", userId)
+                .getSingleResult();
+        if (exists.intValue() > 0) {
+            return true;
+        }
+
+        query = "SELECT EXISTS(select * from finance_entry  join finance_entry_entries on finance_entry_entries.finance_entry_id = finance_entry.id ";
+        query += "join finance_entry_entry on finance_entry_entries.entries_id = finance_entry_entry.id ";
+        query += "where finance_entry.group_id = :groupId and finance_entry_entry.spent_for_id = :userId)";
+        exists = (BigInteger) entityManager
+                .createNativeQuery(query)
+                .setParameter("groupId", groupId)
+                .setParameter("userId", userId)
+                .getSingleResult();
+        return exists.intValue() > 0;
     }
 
     private void distributeRedundantEntries(int toUserId) {

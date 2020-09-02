@@ -59,6 +59,17 @@ public class ChoreDao {
                 .executeUpdate();
     }
 
+    public boolean hasChoresData(int groupId, int userId) {
+        String query = "SELECT EXISTS(select * from chore join chore_entry on chore_entry.chore_id = chore.id ";
+        query += "where chore.group_id = :groupId and chore_entry.user_id = :userId )";
+        BigInteger exists = (BigInteger) entityManager
+                .createNativeQuery(query)
+                .setParameter("groupId", groupId)
+                .setParameter("userId", userId)
+                .getSingleResult();
+        return exists.intValue() > 0;
+    }
+
     public List<ChoreSummary> getAllChoreSummaries(GroupObject group, boolean isOwner) {
         //noinspection unchecked
         return (List<ChoreSummary>) entityManager

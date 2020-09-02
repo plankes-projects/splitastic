@@ -80,6 +80,16 @@ public class ApiSupport {
     public ImageData defaultGroupImage() {
         return loadRandomImageDataFromResourcePath("/img/defaultGroupImages");
     }
+    
+    public ImageData getGhostUserImage() {
+        String file = "/img/other/userProfileGhost.png";
+        try (InputStream ir = getClass().getResourceAsStream(file)) {
+            BufferedImage bi = ImageIO.read(ir);
+            return imageDataDao.getImageDataForFile(bi);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private ImageData loadRandomImageDataFromResourcePath(String path) {
         String file = getRandomFilePathFromClassPathPath(path);
