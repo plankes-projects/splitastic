@@ -86,6 +86,9 @@
           @click="addImaginaryFriend"
         >Add Imaginary Friend</b-button>
       </div>
+      <div v-if="!readOnly" class="addImaginaryFriendButtonContainer">
+        <MoveEntriesButton :group="group"></MoveEntriesButton>
+      </div>
       <b-button
         v-if="isMyUserId(group.owner) && !readOnly"
         type="is-danger"
@@ -139,10 +142,12 @@ import { RouterNames } from "@/untils/RouterNames";
 import { FileUtils } from "@/untils/FileUtils";
 import { StateUtils } from "@/untils/StateUtils";
 import AddOrEditImaginaryFriend from "@/components/AddOrEditImaginaryFriend.vue";
+import MoveEntriesButton from "@/components/EditGroup/MoveEntries/MoveEntriesButton.vue";
 
 @Component({
   components: {
-    AddOrEditImaginaryFriend
+    AddOrEditImaginaryFriend,
+    MoveEntriesButton
   }
 })
 export default class ShowEditGroup extends Vue {
