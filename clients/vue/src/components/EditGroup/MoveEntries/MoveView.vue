@@ -3,6 +3,16 @@
   <div v-else-if="ready" class="card container">
     <div class="mySection">
       <div class="header">
+        Used this to replace a user in the group.
+        <br />(eg.: virtual by real user)
+        <br />
+        <b>Steps:</b>
+        <br />Invite new user into the group
+        <br />Move data from old to new
+        <br />Remove old user from the group
+      </div>
+
+      <div class="header">
         <b>Select the users</b>
       </div>
       <div>
@@ -115,7 +125,7 @@ export default class MoveView extends Vue {
       this.loading = false;
       this.$buefy.toast.open({
         duration: 1000,
-        message: `Successfully moved`,
+        message: `Data successfully moved`,
         type: "is-success"
       });
       this.$emit("move-finished");
@@ -123,7 +133,7 @@ export default class MoveView extends Vue {
       this.loading = false;
       this.$buefy.toast.open({
         duration: 1000,
-        message: `Something failed =(`,
+        message: `Something failed`,
         type: "is-danger"
       });
     }
@@ -149,8 +159,8 @@ export default class MoveView extends Vue {
 }
 
 .container {
-  padding-top: 2em;
-  padding-bottom: 2em;
+  padding-top: 1em;
+  padding-bottom: 1em;
   padding-left: 0;
   padding-right: 0;
 }
