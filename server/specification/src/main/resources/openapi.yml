@@ -252,6 +252,30 @@ paths:
         '200':    # status code
           description: Successfully added the user.
 
+  /group/{groupId}/moveUserData:
+    put:
+      tags:
+        - "Group"
+      summary: Updates a group.
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/moveUserData'
+      responses:
+        '200':
+          description: The task was successfully performed.
+        '204':
+          description: Resource not found.
+
   /user:
     get:
       tags:
@@ -930,6 +954,19 @@ components:
       properties:
         url:
           type: string
+
+    moveUserData:
+      description: Data for the move user data request.
+      type: object
+      properties:
+        fromUserId:
+          type: integer
+        toUserId:
+          type: integer
+        chores:
+          type: boolean
+        finance:
+          type: boolean
 
 # Apply the API key globally to all operations
 security:

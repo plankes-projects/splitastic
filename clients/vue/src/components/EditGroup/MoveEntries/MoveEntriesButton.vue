@@ -2,7 +2,7 @@
   <div>
     <b-button @click="isModalActive = true" type="is-primary">Move all user entries</b-button>
     <b-modal :active.sync="isModalActive">
-      <MoveView :group="group"></MoveView>
+      <MoveView @move-finished="isModalActive = false" :group="group"></MoveView>
     </b-modal>
   </div>
 </template>

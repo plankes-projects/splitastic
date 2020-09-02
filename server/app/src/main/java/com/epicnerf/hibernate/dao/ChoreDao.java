@@ -46,6 +46,19 @@ public class ChoreDao {
         choreRepository.delete(chore);
     }
 
+    @Transactional
+    public void moveChoresToUser(int groupId, int fromUserId, int toUserId) {
+        String query = "update chore join chore_entry on chore_entry.chore_id = chore.id ";
+        query += "set chore_entry.user_id = :toUserId ";
+        query += "where chore.group_id = :groupId and chore_entry.user_id = :fromUserId";
+        entityManager
+                .createNativeQuery(query)
+                .setParameter("groupId", groupId)
+                .setParameter("fromUserId", fromUserId)
+                .setParameter("toUserId", toUserId)
+                .executeUpdate();
+    }
+
     public List<ChoreSummary> getAllChoreSummaries(GroupObject group, boolean isOwner) {
         //noinspection unchecked
         return (List<ChoreSummary>) entityManager

@@ -1,5 +1,6 @@
 <template>
-  <div v-if="ready" class="card container">
+  <b-loading v-if="loading" :is-full-page="true" :active="loading"></b-loading>
+  <div v-else-if="ready" class="card container">
     <div class="mySection">
       <div class="header">
         <b>Select the users</b>
@@ -33,7 +34,9 @@
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
 import UserChooseButton from "@/components/EditGroup/MoveEntries/UserChooseButton.vue";
-import { Group, User } from "@/generated/api-axios";
+import { Group, GroupApi } from "@/generated/api-axios";
+import config from "@/../config";
+import { StateUtils } from "@/untils/StateUtils";
 
 @Component({
   components: {
@@ -44,6 +47,7 @@ export default class MoveView extends Vue {
   @Prop()
   private group!: Group;
   private ready = false;
+  private loading = false;
 
   private userIdFrom = 0;
   private userIdTo = 0;
@@ -68,11 +72,61 @@ export default class MoveView extends Vue {
       });
       return;
     }
-    console.log("applyWithConfirm");
+
+    const which = this.buildWhichString();
+    this.$buefy.dialog.confirm({
+      title: "Move " + which,
+      message:
+        "Are you sure you want to do this? This action cannot be undone.",
+      confirmText: "Move",
+      //type: "is-warning",
+      hasIcon: true,
+      icon: "exclamation-triangle",
+      onConfirm: () => this.apply()
+    });
   }
 
-  private apply() {
-    console.log("Apply");
+  private buildWhichString(): string {
+    if (this.finance && this.chore) {
+      return "finance and chores";
+    }
+
+    if (this.finance) {
+      return "finance";
+    }
+
+    return "chores";
+  }
+
+  private async apply() {
+    this.loading = true;
+
+    const groupApi = new GroupApi({
+      basePath: config.basePath,
+      apiKey: StateUtils.getApiKey()
+    });
+    try {
+      await groupApi.groupGroupIdMoveUserDataPut(this.group.id!, {
+        fromUserId: this.userIdFrom,
+        toUserId: this.userIdTo,
+        chores: this.chore,
+        finance: this.finance
+      });
+      this.loading = false;
+      this.$buefy.toast.open({
+        duration: 1000,
+        message: `Successfully moved`,
+        type: "is-success"
+      });
+      this.$emit("move-finished");
+    } catch (e) {
+      this.loading = false;
+      this.$buefy.toast.open({
+        duration: 1000,
+        message: `Something failed =(`,
+        type: "is-danger"
+      });
+    }
   }
 
   private mounted() {
