@@ -345,6 +345,37 @@ export interface LoginDataSuccess {
     token?: string;
 }
 /**
+ * Data for the move user data request.
+ * @export
+ * @interface MoveUserData
+ */
+export interface MoveUserData {
+    /**
+     * 
+     * @type {number}
+     * @memberof MoveUserData
+     */
+    fromUserId?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof MoveUserData
+     */
+    toUserId?: number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof MoveUserData
+     */
+    chores?: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof MoveUserData
+     */
+    finance?: boolean;
+}
+/**
  * Information of the user.
  * @export
  * @interface User
@@ -2247,6 +2278,59 @@ export const GroupApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * 
+         * @summary Updates a group.
+         * @param {number} groupId The id of the group.
+         * @param {MoveUserData} moveUserData 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupGroupIdMoveUserDataPut: async (groupId: number, moveUserData: MoveUserData, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'groupId' is not null or undefined
+            if (groupId === null || groupId === undefined) {
+                throw new RequiredError('groupId','Required parameter groupId was null or undefined when calling groupGroupIdMoveUserDataPut.');
+            }
+            // verify required parameter 'moveUserData' is not null or undefined
+            if (moveUserData === null || moveUserData === undefined) {
+                throw new RequiredError('moveUserData','Required parameter moveUserData was null or undefined when calling groupGroupIdMoveUserDataPut.');
+            }
+            const localVarPath = `/group/{groupId}/moveUserData`
+                .replace(`{${"groupId"}}`, encodeURIComponent(String(groupId)));
+            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuthHeader required
+            if (configuration && configuration.apiKey) {
+                const localVarApiKeyValue = typeof configuration.apiKey === 'function'
+                    ? await configuration.apiKey("X-API-KEY")
+                    : await configuration.apiKey;
+                localVarHeaderParameter["X-API-KEY"] = localVarApiKeyValue;
+            }
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            localVarUrlObj.query = {...localVarUrlObj.query, ...localVarQueryParameter, ...options.query};
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            const headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof moveUserData !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(moveUserData !== undefined ? moveUserData : {}) : (moveUserData || "");
+
+            return {
+                url: globalImportUrl.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Returns all open invites of this group.
          * @param {number} groupId The id of the invite.
          * @param {*} [options] Override http request option.
@@ -2501,6 +2585,21 @@ export const GroupApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Updates a group.
+         * @param {number} groupId The id of the group.
+         * @param {MoveUserData} moveUserData 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async groupGroupIdMoveUserDataPut(groupId: number, moveUserData: MoveUserData, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await GroupApiAxiosParamCreator(configuration).groupGroupIdMoveUserDataPut(groupId, moveUserData, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary Returns all open invites of this group.
          * @param {number} groupId The id of the invite.
          * @param {*} [options] Override http request option.
@@ -2617,6 +2716,17 @@ export const GroupApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * 
+         * @summary Updates a group.
+         * @param {number} groupId The id of the group.
+         * @param {MoveUserData} moveUserData 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        groupGroupIdMoveUserDataPut(groupId: number, moveUserData: MoveUserData, options?: any): AxiosPromise<void> {
+            return GroupApiFp(configuration).groupGroupIdMoveUserDataPut(groupId, moveUserData, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Returns all open invites of this group.
          * @param {number} groupId The id of the invite.
          * @param {*} [options] Override http request option.
@@ -2724,6 +2834,19 @@ export class GroupApi extends BaseAPI {
      */
     public groupGroupIdGet(groupId: number, options?: any) {
         return GroupApiFp(this.configuration).groupGroupIdGet(groupId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Updates a group.
+     * @param {number} groupId The id of the group.
+     * @param {MoveUserData} moveUserData 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof GroupApi
+     */
+    public groupGroupIdMoveUserDataPut(groupId: number, moveUserData: MoveUserData, options?: any) {
+        return GroupApiFp(this.configuration).groupGroupIdMoveUserDataPut(groupId, moveUserData, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

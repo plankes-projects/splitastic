@@ -4,7 +4,7 @@ import com.epicnerf.hibernate.MapToHibernateModel;
 import com.epicnerf.hibernate.MapToOpenApiModel;
 import com.epicnerf.hibernate.model.FinanceEntry;
 import com.epicnerf.hibernate.model.User;
-import com.epicnerf.hibernate.repository.FinanceRepository;
+import com.epicnerf.hibernate.repository.FinanceEntryRepository;
 import com.epicnerf.model.FinanceEntryEntry;
 import com.epicnerf.service.NotificationManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class FinanceApiDelegateImpl implements FinanceApiDelegate {
     private ApiSupport apiSupport;
 
     @Autowired
-    private FinanceRepository financeRepository;
+    private FinanceEntryRepository financeEntryRepository;
 
     @Autowired
     private MapToHibernateModel mapper;
@@ -34,11 +34,11 @@ public class FinanceApiDelegateImpl implements FinanceApiDelegate {
     private NotificationManager notificationManager;
 
     public ResponseEntity<Void> financeFinanceIdDelete(Integer financeId) {
-        Optional<FinanceEntry> finance = financeRepository.findById(financeId);
+        Optional<FinanceEntry> finance = financeEntryRepository.findById(financeId);
 
         User user = apiSupport.getCurrentUser();
         if (finance.isPresent() && canDelete(finance.get(), user)) {
-            financeRepository.delete(finance.get());
+            financeEntryRepository.delete(finance.get());
             notificationManager.onFinanceEntryDelete(user, finance.get());
             return new ResponseEntity<>(HttpStatus.OK);
         }
@@ -59,7 +59,7 @@ public class FinanceApiDelegateImpl implements FinanceApiDelegate {
 
     public ResponseEntity<com.epicnerf.model.FinanceEntry> financeFinanceIdGet(Integer financeId) {
         User user = apiSupport.getCurrentUser();
-        Optional<FinanceEntry> finance = financeRepository.findById(financeId);
+        Optional<FinanceEntry> finance = financeEntryRepository.findById(financeId);
         if (finance.isPresent()) {
             apiSupport.validateUserIsInGroup(finance.get().getGroup(), user.getId());
             com.epicnerf.model.FinanceEntry entry = openApiMapper.map(finance.get());
@@ -71,7 +71,7 @@ public class FinanceApiDelegateImpl implements FinanceApiDelegate {
 
     public ResponseEntity<Void> financePut(com.epicnerf.model.FinanceEntry financeEntry) {
         User user = apiSupport.getCurrentUser();
-        Optional<FinanceEntry> finance = financeRepository.findById(financeEntry.getId());
+        Optional<FinanceEntry> finance = financeEntryRepository.findById(financeEntry.getId());
         if (finance.isPresent() && finance.get().getSpentFrom().getId().equals(user.getId())) {
             FinanceEntry f = mapper.mapFinance(financeEntry, true);
             f.setGroup(finance.get().getGroup());
@@ -80,7 +80,7 @@ public class FinanceApiDelegateImpl implements FinanceApiDelegate {
                 apiSupport.validateUserIsInGroup(finance.get().getGroup(), entry.getSpentFor());
             }
 
-            financeRepository.save(f);
+            financeEntryRepository.save(f);
             return new ResponseEntity<>(HttpStatus.OK);
         }
 

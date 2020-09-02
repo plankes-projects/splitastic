@@ -7,7 +7,7 @@ import com.epicnerf.hibernate.model.GroupInvite;
 import com.epicnerf.hibernate.model.GroupObject;
 import com.epicnerf.hibernate.model.ImageData;
 import com.epicnerf.hibernate.model.User;
-import com.epicnerf.hibernate.repository.FinanceRepository;
+import com.epicnerf.hibernate.repository.FinanceEntryRepository;
 import com.epicnerf.hibernate.repository.GroupInviteRepository;
 import com.epicnerf.hibernate.repository.GroupObjectRepository;
 import com.epicnerf.hibernate.repository.UserRepository;
@@ -55,7 +55,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
     private MapToHibernateModel mapper;
 
     @Autowired
-    private FinanceRepository financeRepository;
+    private FinanceEntryRepository financeEntryRepository;
 
     @Autowired
     private FinanceEntryDao financeEntryDao;
@@ -68,6 +68,8 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
 
     @Autowired
     private NotificationManager notificationManager;
+    @Autowired
+    private ChoreDao choreDao;
 
     public ResponseEntity<List<Group>> groupGet(Integer num, Integer lastId) {
         User user = apiSupport.getCurrentUser();
@@ -114,7 +116,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
             com.epicnerf.hibernate.model.FinanceEntry f = mapper.mapFinance(financeEntry, false);
             f.setCreatedBy(user);
             f.setGroup(group.get());
-            financeRepository.save(f);
+            financeEntryRepository.save(f);
             notificationManager.onFinanceEntryAdded(f);
 
             return ResponseEntity.ok(openApiMapper.map(f));
@@ -126,13 +128,8 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
         User user = apiSupport.getCurrentUser();
         Optional<GroupObject> group = groupObjectRepository.findById(groupId);
         if (group.isPresent() && group.get().getOwner().getId().equals(user.getId())) {
-            User newUser = new User();
-            newUser.setEmail(UUID.randomUUID().toString());
-            newUser.setName(addVirtualUserData.getName());
-            newUser.setImage(apiSupport.defaultUserImage());
-            newUser.setVirtualUser(true);
+            User newUser = createVirtualUser(addVirtualUserData.getName());
             userRepository.save(newUser);
-
             group.get().getUsers().add(newUser);
             groupObjectRepository.save(group.get());
 
@@ -141,6 +138,15 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
             return new ResponseEntity<>(HttpStatus.OK);
         }
         throw new NoResultException();
+    }
+
+    private User createVirtualUser(String name) {
+        User newUser = new User();
+        newUser.setEmail(UUID.randomUUID().toString());
+        newUser.setName(name);
+        newUser.setImage(apiSupport.defaultUserImage());
+        newUser.setVirtualUser(true);
+        return newUser;
     }
 
     public ResponseEntity<GroupBalanceData> groupGroupIdBalanceGet(Integer groupId) {
@@ -186,6 +192,27 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
         }
 
         throw new NoResultException();
+    }
+
+    public ResponseEntity<Void> groupGroupIdMoveUserDataPut(Integer groupId, MoveUserData moveUserData) {
+        User user = apiSupport.getCurrentUser();
+        Optional<GroupObject> group = groupObjectRepository.findById(groupId);
+
+        if (group.isPresent() && group.get().getOwner().getId().equals(user.getId())) {
+            apiSupport.validateUserIsInGroup(group.get(), moveUserData.getToUserId());
+            moveUserData(group.get().getId(), moveUserData);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        throw new NoResultException();
+    }
+
+    private void moveUserData(Integer groupId, MoveUserData moveUserData) {
+        if (moveUserData.getChores()) {
+            choreDao.moveChoresToUser(groupId, moveUserData.getFromUserId(), moveUserData.getToUserId());
+        }
+        if (moveUserData.getFinance()) {
+            financeEntryDao.moveFinanceToUser(groupId, moveUserData.getFromUserId(), moveUserData.getToUserId());
+        }
     }
 
     public boolean userIsInGroup(GroupObject group, Integer userId) {
@@ -242,13 +269,42 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
             if ((isOwner && isOtherUser) || (!isOwner && !isOtherUser)) {
                 User userLeft = getUserFromGroup(g.get(), userId);
                 g.get().getUsers().removeIf(u -> u.getId().equals(userId));
-                groupObjectRepository.save(g.get());
+
+                if (needGhostUser(groupId, userId)) {
+                    User ghost = createNewGhostUserWithName(userLeft.getName());
+                    userRepository.save(ghost);
+
+                    g.get().getUsers().add(ghost);
+                    groupObjectRepository.save(g.get());
+
+                    MoveUserData moveUserData = new MoveUserData()
+                            .chores(true)
+                            .finance(true)
+                            .fromUserId(userLeft.getId())
+                            .toUserId(ghost.getId());
+                    moveUserData(groupId, moveUserData);
+                } else {
+                    groupObjectRepository.save(g.get());
+                }
                 notificationManager.onGroupLeft(user, g.get(), userLeft);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
         }
 
         throw new NoResultException();
+    }
+
+    private boolean needGhostUser(int groupId, int userId) {
+        if (choreDao.hasChoresData(groupId, userId)) {
+            return true;
+        }
+        return financeEntryDao.hasFinanceData(groupId, userId);
+    }
+
+    private User createNewGhostUserWithName(String name) {
+        User user = createVirtualUser(name);
+        user.setImage(apiSupport.getGhostUserImage());
+        return user;
     }
 
     @NonNull

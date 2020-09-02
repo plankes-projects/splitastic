@@ -86,6 +86,9 @@
           @click="addImaginaryFriend"
         >Add Imaginary Friend</b-button>
       </div>
+      <div v-if="!readOnly" class="addImaginaryFriendButtonContainer">
+        <MoveEntriesButton :group="group"></MoveEntriesButton>
+      </div>
       <b-button
         v-if="isMyUserId(group.owner) && !readOnly"
         type="is-danger"
@@ -139,10 +142,12 @@ import { RouterNames } from "@/untils/RouterNames";
 import { FileUtils } from "@/untils/FileUtils";
 import { StateUtils } from "@/untils/StateUtils";
 import AddOrEditImaginaryFriend from "@/components/AddOrEditImaginaryFriend.vue";
+import MoveEntriesButton from "@/components/EditGroup/MoveEntries/MoveEntriesButton.vue";
 
 @Component({
   components: {
-    AddOrEditImaginaryFriend
+    AddOrEditImaginaryFriend,
+    MoveEntriesButton
   }
 })
 export default class ShowEditGroup extends Vue {
@@ -250,13 +255,28 @@ export default class ShowEditGroup extends Vue {
       apiKey: StateUtils.getApiKey()
     });
     try {
+      const countBeforeUserDelete = this.group.users!.length;
       this.loading = true;
       await api.groupGroupIdUserUserIdDelete(Number(this.group.id), userId);
       if (isLeave) {
         StateUtils.unsetActiveGroupId();
         this.$router.push({ name: RouterNames.HOME });
       } else {
-        this.refresh();
+        await this.refresh();
+        const countAfterUserDelete = this.group.users!.length;
+        if (countBeforeUserDelete == countAfterUserDelete) {
+          this.$buefy.toast.open({
+            duration: 3000,
+            message: `A ghost of this user is still here because he has entries in the group.`,
+            type: "is-danger"
+          });
+        } else {
+          this.$buefy.toast.open({
+            duration: 1000,
+            message: `User deleted`,
+            type: "is-success"
+          });
+        }
       }
     } catch (e) {
       this.loading = false;
