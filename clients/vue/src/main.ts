@@ -31,7 +31,7 @@ Vue.use(Toast, {
   transition: "Vue-Toastification__bounce",
   maxToasts: 20,
   newestOnTop: true,
-  timeout: 1000,
+  timeout: 2000,
   position: "top-center",
 });
 
