@@ -121,4 +121,11 @@ export default class AddOrEditImaginaryFriend extends Vue {
   padding: $formDataPadding;
   margin: 2em;
 }
+
+.profileImage {
+  border-radius: 50%;
+  object-fit: cover;
+  height: 6em;
+  width: 6em;
+}
 </style>
