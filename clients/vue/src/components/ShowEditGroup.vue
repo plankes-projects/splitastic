@@ -1,10 +1,6 @@
 <template>
   <div class="formData">
-    <b-loading
-      v-if="loading"
-      :is-full-page="true"
-      :active="loading"
-    ></b-loading>
+    <b-loading v-if="loading" :is-full-page="true" :active="loading"></b-loading>
     <template v-if="atLeastOneRefreshDone">
       <b-upload v-model="newProfileImage" accept="image/*">
         <img class="groupImage" :src="group.image.url" alt="Image" />
@@ -12,11 +8,7 @@
       <br />
       <p>Tap image to change</p>
       <span v-if="newProfileImage" class="tag is-primary">
-        <button
-          class="removeNewFile delete is-small"
-          type="button"
-          @click="removeNewFile()"
-        ></button>
+        <button class="removeNewFile delete is-small" type="button" @click="removeNewFile()"></button>
         Change to: {{ newProfileImage.name }}
       </span>
 
@@ -24,18 +16,11 @@
         <b-input v-model="group.name" :readonly="readOnly"></b-input>
       </b-field>
       <b-field id="descField" label="Description">
-        <b-input
-          v-model="group.description"
-          maxlength="255"
-          type="textarea"
-          :readonly="readOnly"
-        ></b-input>
+        <b-input v-model="group.description" maxlength="255" type="textarea" :readonly="readOnly"></b-input>
       </b-field>
 
       <section id="saveButton" v-if="!readOnly">
-        <b-button v-if="!savingGroupDetails" @click="saveGroupDetails"
-          >SAVE</b-button
-        >
+        <b-button v-if="!savingGroupDetails" @click="saveGroupDetails">SAVE</b-button>
         <b-icon v-else icon="sync" type="is-success" class="fa-spin"></b-icon>
       </section>
 
@@ -60,11 +45,7 @@
               type="is-warning"
             ></b-icon>
 
-            <a
-              v-if="!readOnly && user.isVirtual"
-              class="level-item"
-              @click="editVirtualUser(user)"
-            >
+            <a v-if="!readOnly && user.isVirtual" class="level-item" @click="editVirtualUser(user)">
               <b-icon icon="edit" size="is-small"></b-icon>
             </a>
             <a
@@ -83,11 +64,7 @@
           <p class="level-left level-item">Open Invites</p>
 
           <a class="level-right level-item" @click="isInviteModalActive = true">
-            <b-icon
-              icon="plus-circle"
-              size="is-small"
-              type="is-success"
-            ></b-icon>
+            <b-icon icon="plus-circle" size="is-small" type="is-success"></b-icon>
           </a>
         </div>
 
@@ -97,18 +74,17 @@
           :key="invite.id"
         >
           <p class="level-left level-item">{{ invite.email }}</p>
-          <a
-            class="level-right level-item"
-            @click="deleteInviteWithConfirm(invite.id)"
-          >
+          <a class="level-right level-item" @click="deleteInviteWithConfirm(invite.id)">
             <b-icon icon="trash" size="is-small" type="is-danger"></b-icon>
           </a>
         </div>
       </div>
       <div v-if="!readOnly" class="addImaginaryFriendButtonContainer">
-        <b-button type="is-success" icon-left="plus" @click="addImaginaryFriend"
-          >Add Imaginary Friend</b-button
-        >
+        <b-button
+          type="is-success"
+          icon-left="plus"
+          @click="addImaginaryFriend"
+        >Add Imaginary Friend</b-button>
       </div>
       <div v-if="!readOnly" class="addImaginaryFriendButtonContainer">
         <MoveEntriesButton :group="group"></MoveEntriesButton>
@@ -118,27 +94,20 @@
         type="is-danger"
         icon-left="trash"
         @click="deleteGroupWithConfirm(group.id)"
-        >Delete Group</b-button
-      >
+      >Delete Group</b-button>
       <b-button
         v-if="!isMyUserId(group.owner) && readOnly"
         type="is-danger"
         icon-left="trash"
         @click="leaveGroupWithConfirm(group.id)"
-        >Leave Group</b-button
-      >
+      >Leave Group</b-button>
 
       <b-modal :active.sync="isInviteModalActive" scroll="keep">
         <section class="section">
           <div class="card">
             <div class="card-content">
               <b-field class="email" label="Email">
-                <b-input
-                  type="email"
-                  icon="envelope"
-                  placeholder="Email"
-                  v-model="inviteEmail"
-                ></b-input>
+                <b-input type="email" icon="envelope" placeholder="Email" v-model="inviteEmail"></b-input>
               </b-field>
               <b-button @click="sendInvite">SEND INVITE</b-button>
             </div>
@@ -177,8 +146,8 @@ import MoveEntriesButton from "@/components/EditGroup/MoveEntries/MoveEntriesBut
 @Component({
   components: {
     AddOrEditImaginaryFriend,
-    MoveEntriesButton,
-  },
+    MoveEntriesButton
+  }
 })
 export default class ShowEditGroup extends Vue {
   @Prop()
@@ -232,7 +201,7 @@ export default class ShowEditGroup extends Vue {
       confirmText: "Leave Group",
       type: "is-danger",
       hasIcon: true,
-      onConfirm: () => this.deleteUser(localStorage.userId, true),
+      onConfirm: () => this.deleteUser(localStorage.userId, true)
     });
   }
 
@@ -244,13 +213,13 @@ export default class ShowEditGroup extends Vue {
       confirmText: "Delete Group",
       type: "is-danger",
       hasIcon: true,
-      onConfirm: () => this.deleteGroup(groupId),
+      onConfirm: () => this.deleteGroup(groupId)
     });
   }
   private async deleteGroup(groupId: number) {
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey(),
+      apiKey: StateUtils.getApiKey()
     });
     try {
       this.loading = true;
@@ -271,14 +240,14 @@ export default class ShowEditGroup extends Vue {
       confirmText: "Remove User",
       type: "is-danger",
       hasIcon: true,
-      onConfirm: () => this.deleteUser(userId, false),
+      onConfirm: () => this.deleteUser(userId, false)
     });
   }
 
   private async deleteUser(userId: number, isLeave: boolean) {
     const api = new UserApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey(),
+      apiKey: StateUtils.getApiKey()
     });
     try {
       const countBeforeUserDelete = this.group.users!.length;
@@ -294,7 +263,7 @@ export default class ShowEditGroup extends Vue {
           this.$toast.error(
             `A ghost of this user is still here because he has entries in the group.`,
             {
-              timeout: 3000,
+              timeout: 4000
             }
           );
         } else {
@@ -315,14 +284,14 @@ export default class ShowEditGroup extends Vue {
       confirmText: "Delete Invite",
       type: "is-danger",
       hasIcon: true,
-      onConfirm: () => this.deleteInvite(inviteId),
+      onConfirm: () => this.deleteInvite(inviteId)
     });
   }
 
   private async deleteInvite(inviteId: number) {
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey(),
+      apiKey: StateUtils.getApiKey()
     });
     try {
       this.loading = true;
@@ -336,7 +305,7 @@ export default class ShowEditGroup extends Vue {
   private async sendInvite() {
     const api = new UserApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey(),
+      apiKey: StateUtils.getApiKey()
     });
 
     try {
@@ -356,12 +325,12 @@ export default class ShowEditGroup extends Vue {
     this.savingGroupDetails = true;
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey(),
+      apiKey: StateUtils.getApiKey()
     });
 
     if (this.newProfileImage) {
       this.group!.image = {
-        url: await FileUtils.loadToDataURL(this.newProfileImage),
+        url: await FileUtils.loadToDataURL(this.newProfileImage)
       };
     } else {
       this.group!.image = undefined;
@@ -391,7 +360,7 @@ export default class ShowEditGroup extends Vue {
     this.loading = true;
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey(),
+      apiKey: StateUtils.getApiKey()
     });
 
     this.group = (
