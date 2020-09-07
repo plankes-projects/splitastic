@@ -1,6 +1,10 @@
 <template>
   <div class>
-    <b-loading v-if="loading" :is-full-page="true" :active="loading"></b-loading>
+    <b-loading
+      v-if="loading"
+      :is-full-page="true"
+      :active="loading"
+    ></b-loading>
     <template v-if="atLeastOneRefreshDone">
       <div class="profileData">
         <b-upload v-model="newProfileImage" accept="image/*">
@@ -9,21 +13,34 @@
         <br />
         <p>Tap image to change</p>
         <span v-if="newProfileImage" class="tag is-primary">
-          <button class="removeNewFile delete is-small" type="button" @click="removeNewFile()"></button>
-          Change to: {{newProfileImage.name}}
+          <button
+            class="removeNewFile delete is-small"
+            type="button"
+            @click="removeNewFile()"
+          ></button>
+          Change to: {{ newProfileImage.name }}
         </span>
         <b-field label="Email">
-          <b-input type="email" icon="envelope" v-model="user.email" readonly></b-input>
+          <b-input
+            type="email"
+            icon="envelope"
+            v-model="user.email"
+            readonly
+          ></b-input>
         </b-field>
         <b-field label="Name">
           <b-input v-model="user.name"></b-input>
         </b-field>
         <section id="saveButton">
-          <b-button v-if="!savingUserDetails" @click="saveUserDetails">SAVE</b-button>
+          <b-button v-if="!savingUserDetails" @click="saveUserDetails"
+            >SAVE</b-button
+          >
           <b-icon v-else icon="sync" type="is-success" class="fa-spin"></b-icon>
         </section>
       </div>
-      <b-button @click="logoutOnAll()" class="logoutButton" type="is-danger">Logout on ALL devices</b-button>
+      <b-button @click="logoutOnAll()" class="logoutButton" type="is-danger"
+        >Logout on ALL devices</b-button
+      >
     </template>
   </div>
 </template>
@@ -52,7 +69,7 @@ export default class Profile extends Vue {
   private async logoutOnAll() {
     const api = new UserApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
 
     await api.userResetApiKeyPut();
@@ -63,12 +80,12 @@ export default class Profile extends Vue {
     this.savingUserDetails = true;
     const api = new UserApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
 
     if (this.newProfileImage) {
       this.user!.image = {
-        url: await FileUtils.loadToDataURL(this.newProfileImage)
+        url: await FileUtils.loadToDataURL(this.newProfileImage),
       };
     } else {
       this.user!.image = undefined;
@@ -76,11 +93,7 @@ export default class Profile extends Vue {
 
     await api.userPut(this.user!);
 
-    this.$buefy.toast.open({
-      duration: 1000,
-      message: `Successfully updated`,
-      type: "is-success"
-    });
+    this.$toast.success(`Successfully updated`);
 
     this.refresh();
 
@@ -92,7 +105,7 @@ export default class Profile extends Vue {
     this.newProfileImage = null;
     const api = new UserApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
     this.user = (await api.userGet()).data;
     this.imageUrl = this.user!.image!.url!;
@@ -105,7 +118,6 @@ export default class Profile extends Vue {
   }
 }
 </script>
-
 
 <style scoped lang="scss">
 .profileImage {

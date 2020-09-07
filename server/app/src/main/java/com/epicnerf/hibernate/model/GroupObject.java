@@ -37,7 +37,7 @@ public class GroupObject {
     @Column(nullable = false)
     private String description;
 
-    @OneToOne(cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @ManyToOne(cascade = {CascadeType.ALL})
     private ImageData image;
 
     public String getDescription() {

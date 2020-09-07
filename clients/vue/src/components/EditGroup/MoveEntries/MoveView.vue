@@ -7,8 +7,7 @@
         <br />(eg.: virtual by real user)
         <br />
         <b>Steps:</b>
-        <br />Invite new user into the group
-        <br />Move data from old to new
+        <br />Invite new user into the group <br />Move data from old to new
         <br />Remove old user from the group
       </div>
 
@@ -16,9 +15,17 @@
         <b>Select the users</b>
       </div>
       <div>
-        <UserChooseButton class="inline-block" :group="group" :userId.sync="userIdFrom"></UserChooseButton>
+        <UserChooseButton
+          class="inline-block"
+          :group="group"
+          :userId.sync="userIdFrom"
+        ></UserChooseButton>
         <b-icon class="arrow" icon="arrow-right" size="is-large"></b-icon>
-        <UserChooseButton class="inline-block" :group="group" :userId.sync="userIdTo"></UserChooseButton>
+        <UserChooseButton
+          class="inline-block"
+          :group="group"
+          :userId.sync="userIdTo"
+        ></UserChooseButton>
       </div>
     </div>
     <div class="mySection">
@@ -36,7 +43,9 @@
     </div>
 
     <div>
-      <b-button size="is-medium" icon-left="check" @click="applyWithConfirm">Apply</b-button>
+      <b-button size="is-medium" icon-left="check" @click="applyWithConfirm"
+        >Apply</b-button
+      >
     </div>
   </div>
 </template>
@@ -50,8 +59,8 @@ import { StateUtils } from "@/untils/StateUtils";
 
 @Component({
   components: {
-    UserChooseButton
-  }
+    UserChooseButton,
+  },
 })
 export default class MoveView extends Vue {
   @Prop()
@@ -67,19 +76,11 @@ export default class MoveView extends Vue {
 
   private applyWithConfirm() {
     if (this.userIdFrom == this.userIdTo) {
-      this.$buefy.toast.open({
-        duration: 1000,
-        message: `Need different users`,
-        type: "is-danger"
-      });
+      this.$toast.error(`Need different users`);
       return;
     }
     if (!this.finance && !this.chore) {
-      this.$buefy.toast.open({
-        duration: 1000,
-        message: `Need at least one data select`,
-        type: "is-danger"
-      });
+      this.$toast.error(`Need at least one data select`);
       return;
     }
 
@@ -92,7 +93,7 @@ export default class MoveView extends Vue {
       //type: "is-warning",
       hasIcon: true,
       icon: "exclamation-triangle",
-      onConfirm: () => this.apply()
+      onConfirm: () => this.apply(),
     });
   }
 
@@ -113,29 +114,21 @@ export default class MoveView extends Vue {
 
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
     try {
       await groupApi.groupGroupIdMoveUserDataPut(this.group.id!, {
         fromUserId: this.userIdFrom,
         toUserId: this.userIdTo,
         chores: this.chore,
-        finance: this.finance
+        finance: this.finance,
       });
       this.loading = false;
-      this.$buefy.toast.open({
-        duration: 1000,
-        message: `Data successfully moved`,
-        type: "is-success"
-      });
+      this.$toast.success(`Data successfully moved`);
       this.$emit("move-finished");
     } catch (e) {
       this.loading = false;
-      this.$buefy.toast.open({
-        duration: 1000,
-        message: `Something failed`,
-        type: "is-danger"
-      });
+      this.$toast.error(`Something failed`);
     }
   }
 

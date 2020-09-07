@@ -1,6 +1,10 @@
 <template>
   <div class="section">
-    <b-loading v-if="loading" :is-full-page="true" :active="loading"></b-loading>
+    <b-loading
+      v-if="loading"
+      :is-full-page="true"
+      :active="loading"
+    ></b-loading>
     <div class="profileData">
       <div v-if="imageUrl">
         <b-upload v-model="newProfileImage" accept="image/*">
@@ -9,8 +13,12 @@
         <br />
         <p>Tap image to change</p>
         <span v-if="newProfileImage" class="tag is-primary">
-          <button class="removeNewFile delete is-small" type="button" @click="removeNewFile()"></button>
-          Change to: {{newProfileImage.name}}
+          <button
+            class="removeNewFile delete is-small"
+            type="button"
+            @click="removeNewFile()"
+          ></button>
+          Change to: {{ newProfileImage.name }}
         </span>
       </div>
       <b-field label="Name">
@@ -48,11 +56,7 @@ export default class AddOrEditImaginaryFriend extends Vue {
   }
   private async saveClicked() {
     if (this.userName.length == 0) {
-      this.$buefy.toast.open({
-        duration: 1000,
-        message: `Username shall not be empty`,
-        type: "is-danger"
-      });
+      this.$toast.error(`Username shall not be empty`);
       return;
     }
 
@@ -68,11 +72,7 @@ export default class AddOrEditImaginaryFriend extends Vue {
       this.$emit("user-created");
     } catch (e) {
       this.loading = false;
-      this.$buefy.toast.open({
-        duration: 1000,
-        message: `Somewthing went wrong =(`,
-        type: "is-danger"
-      });
+      this.$toast.error(`Something went wrong`);
     }
     this.loading = false;
   }
@@ -80,17 +80,17 @@ export default class AddOrEditImaginaryFriend extends Vue {
   private async createUser() {
     const api = new GroupApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
     await api.groupGroupIdAddVirtualUserPost(Number(this.groupId), {
-      name: this.userName
+      name: this.userName,
     });
   }
 
   private async updateUser() {
     const api = new UserApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
 
     const userToUpdate = Object.assign({}, this.user!);
@@ -98,7 +98,7 @@ export default class AddOrEditImaginaryFriend extends Vue {
 
     if (this.newProfileImage) {
       userToUpdate.image = {
-        url: await FileUtils.loadToDataURL(this.newProfileImage)
+        url: await FileUtils.loadToDataURL(this.newProfileImage),
       };
     } else {
       userToUpdate.image = undefined;
@@ -120,5 +120,12 @@ export default class AddOrEditImaginaryFriend extends Vue {
   background-color: $transbarentBackground;
   padding: $formDataPadding;
   margin: 2em;
+}
+
+.profileImage {
+  border-radius: 50%;
+  object-fit: cover;
+  height: 6em;
+  width: 6em;
 }
 </style>

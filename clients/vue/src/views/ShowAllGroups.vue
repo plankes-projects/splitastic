@@ -1,6 +1,10 @@
 <template>
   <div class="section">
-    <b-loading v-if="loading" :is-full-page="true" :active="loading"></b-loading>
+    <b-loading
+      v-if="loading"
+      :is-full-page="true"
+      :active="loading"
+    ></b-loading>
     <template v-if="atLeastOneRefreshDone">
       <div v-if="invites.length != 0" class="panel">
         <div class="margin0 panel-heading level is-mobile">
@@ -18,7 +22,10 @@
               <a @click="acceptInviteWithConfirm(invite.group.id)">
                 <b-icon icon="check" size="is-small" type="is-success"></b-icon>
               </a>
-              <a class="deleteInvite" @click="deleteInviteWithInvite(invite.id)">
+              <a
+                class="deleteInvite"
+                @click="deleteInviteWithInvite(invite.id)"
+              >
                 <b-icon icon="trash" size="is-small" type="is-danger"></b-icon>
               </a>
             </td>
@@ -29,12 +36,18 @@
       <template v-if="userHasGroups">
         <div class="panel">
           <p class="panel-heading">Your groups:</p>
-          <div class="groupCardContainer" v-for="group in groups" :key="group.id">
+          <div
+            class="groupCardContainer"
+            v-for="group in groups"
+            :key="group.id"
+          >
             <GroupCard :group="group" :myUserId="user.id" />
           </div>
         </div>
       </template>
-      <template v-else>You are in no groups yet. Use the menu to create a new group.</template>
+      <template v-else
+        >You are in no groups yet. Use the menu to create a new group.</template
+      >
     </template>
   </div>
 </template>
@@ -48,15 +61,15 @@ import {
   User,
   GroupApi,
   Group,
-  Invite
+  Invite,
 } from "@/generated/api-axios/api";
 import GroupCard from "@/components/GroupCard.vue";
 import { StateUtils } from "@/untils/StateUtils";
 
 @Component({
   components: {
-    GroupCard
-  }
+    GroupCard,
+  },
 })
 export default class ShowAllGroups extends Vue {
   private user!: User;
@@ -73,14 +86,14 @@ export default class ShowAllGroups extends Vue {
       confirmText: "Delete Invite",
       type: "is-danger",
       hasIcon: true,
-      onConfirm: () => this.deleteInvite(inviteId)
+      onConfirm: () => this.deleteInvite(inviteId),
     });
   }
 
   private async deleteInvite(inviteId: number) {
     const api = new GroupApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
 
     try {
@@ -89,11 +102,7 @@ export default class ShowAllGroups extends Vue {
       this.refresh();
     } catch (e) {
       this.loading = false;
-      this.$buefy.toast.open({
-        duration: 1000,
-        message: `Join failed =(`,
-        type: "is-danger"
-      });
+      this.$toast.error(`Delete failed`);
     }
   }
   private async acceptInviteWithConfirm(groupId: number) {
@@ -103,14 +112,14 @@ export default class ShowAllGroups extends Vue {
       confirmText: "Accept Invite",
       type: "is-success",
       hasIcon: true,
-      onConfirm: () => this.acceptInvite(groupId)
+      onConfirm: () => this.acceptInvite(groupId),
     });
   }
 
   private async acceptInvite(groupId: number) {
     const userApi = new UserApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
 
     try {
@@ -119,11 +128,7 @@ export default class ShowAllGroups extends Vue {
       this.refresh();
     } catch (e) {
       this.loading = false;
-      this.$buefy.toast.open({
-        duration: 1000,
-        message: `Join failed =(`,
-        type: "is-danger"
-      });
+      this.$toast.error(`Join failed`);
     }
   }
 
@@ -131,7 +136,7 @@ export default class ShowAllGroups extends Vue {
     this.loading = true;
     const apiConfig: Configuration = {
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     };
     const userApi = new UserApi(apiConfig);
     const groupApi = new GroupApi(apiConfig);

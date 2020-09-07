@@ -15,10 +15,20 @@
           </td>
           <td class="headButtonContainer">
             <a @click="decreaseWithConfirm()">
-              <b-icon class="headButton" icon="minus-square" size="is-medium" type="is-danger"></b-icon>
+              <b-icon
+                class="headButton"
+                icon="minus-square"
+                size="is-medium"
+                type="is-danger"
+              ></b-icon>
             </a>
             <a @click="increaseWithConfirm()">
-              <b-icon class="headButton" icon="plus-square" size="is-medium" type="is-info"></b-icon>
+              <b-icon
+                class="headButton"
+                icon="plus-square"
+                size="is-medium"
+                type="is-info"
+              ></b-icon>
             </a>
           </td>
         </tr>
@@ -29,18 +39,22 @@
       <a class="infoButton" @click="showChoreClicked()">
         <b-icon icon="info-circle" size="is-small"></b-icon>
       </a>
-      {{choreSum.chore.description}}
+      {{ choreSum.chore.description }}
     </div>
     <div class="userList">
-      <div class="userListEntry" v-for="userAndCount in userAndCounts" :key="userAndCount.user.id">
+      <div
+        class="userListEntry"
+        v-for="userAndCount in userAndCounts"
+        :key="userAndCount.user.id"
+      >
         <div>
           <strong>
             <template v-if="userAndCount.count > 0">+</template>
-            <template>{{userAndCount.count}}</template>
+            <template>{{ userAndCount.count }}</template>
           </strong>
         </div>
         <img class="userImage" :src="userAndCount.user.image.url" alt="Image" />
-        <div class="name">{{userAndCount.user.name}}</div>
+        <div class="name">{{ userAndCount.user.name }}</div>
       </div>
     </div>
   </div>
@@ -51,7 +65,7 @@ import { Component, Prop, Vue } from "vue-property-decorator";
 import { Group, ChoreSummary, ChoreApi, User } from "@/generated/api-axios";
 import { RouterNames } from "@/untils/RouterNames";
 import config from "@/../config";
-import { StateUtils } from '@/untils/StateUtils';
+import { StateUtils } from "@/untils/StateUtils";
 
 class UserAndCount {
   public count = 0;
@@ -89,7 +103,7 @@ export default class ChoreCard extends Vue {
         confirmText: "Add",
         type: "is-success",
         hasIcon: true,
-        onConfirm: () => this.increase()
+        onConfirm: () => this.increase(),
       });
     }
   }
@@ -98,16 +112,12 @@ export default class ChoreCard extends Vue {
     this.changeCount = true;
     const api = new ChoreApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
 
     await api.choreChoreIdPost(Number(this.choreSum!.chore!.id));
     this.changeCount = false;
-    this.$buefy.toast.open({
-      duration: 1000,
-      message: `Successfully increased`,
-      type: "is-success"
-    });
+    this.$toast.success(`Successfully increased`);
     this.myCount++;
     this.userAndCounts[0].count++;
     this.updateheaderColorClass();
@@ -124,7 +134,7 @@ export default class ChoreCard extends Vue {
         confirmText: "Remove",
         type: "is-danger",
         hasIcon: true,
-        onConfirm: () => this.decrease()
+        onConfirm: () => this.decrease(),
       });
     }
   }
@@ -133,16 +143,12 @@ export default class ChoreCard extends Vue {
     this.changeCount = true;
     const api = new ChoreApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
 
     await api.choreChoreIdEntryDelete(Number(this.choreSum!.chore!.id));
     this.changeCount = false;
-    this.$buefy.toast.open({
-      duration: 1000,
-      message: `Successfully decreased`,
-      type: "is-success"
-    });
+    this.$toast.success(`Successfully decreased`);
     this.myCount--;
     this.userAndCounts[0].count--;
     this.updateheaderColorClass();
@@ -151,7 +157,7 @@ export default class ChoreCard extends Vue {
   private showChoreClicked() {
     this.$router.push({
       name: RouterNames.SHOW_CHORE,
-      params: { choreId: this.choreSum.chore!.id!.toString() }
+      params: { choreId: this.choreSum.chore!.id!.toString() },
     });
   }
   private async refresh() {

@@ -32,7 +32,7 @@ public class User {
     @Column(unique = true, nullable = false, length = 36)
     private String token = UUID.randomUUID().toString();
 
-    @OneToOne(cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @ManyToOne(cascade = {CascadeType.ALL})
     private ImageData image;
 
     @Column

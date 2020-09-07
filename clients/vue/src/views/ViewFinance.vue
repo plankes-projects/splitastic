@@ -1,28 +1,46 @@
 <template>
   <div class>
-    <b-loading v-if="loading" :is-full-page="true" :active="loading"></b-loading>
+    <b-loading
+      v-if="loading"
+      :is-full-page="true"
+      :active="loading"
+    ></b-loading>
     <template v-else>
       <b-button
         class="backButton"
         type="is-warning"
         icon-left="arrow-left"
         @click="backClicked()"
-      >Back</b-button>
+        >Back</b-button
+      >
       <section>
         <div class="formData">
           <b-field label="Title">
             <b-input v-model="finance.title" readonly></b-input>
           </b-field>
           <b-field label="Amount Spent (€)">
-            <b-input v-model="amount" placeholder="Number" type="number" readonly></b-input>
+            <b-input
+              v-model="amount"
+              placeholder="Number"
+              type="number"
+              readonly
+            ></b-input>
           </b-field>
 
           <div v-if="createdByUser">
             <p class="forLabel">
-              <b-icon class="proxyInsertIcon" icon="hands-helping" size="is-small"></b-icon>
+              <b-icon
+                class="proxyInsertIcon"
+                icon="hands-helping"
+                size="is-small"
+              ></b-icon>
               <b>Inserted by:</b>
             </p>
-            <b-checkbox-button type="is-success" class="block userButton" disabled="disabled">
+            <b-checkbox-button
+              type="is-success"
+              class="block userButton"
+              disabled="disabled"
+            >
               <div class="name">{{ createdByUser.name }}</div>
             </b-checkbox-button>
             <figure class="image imageContainer">
@@ -32,7 +50,11 @@
           <p class="forLabel">
             <b>Paid by:</b>
           </p>
-          <b-checkbox-button type="is-success" class="block userButton" disabled="disabled">
+          <b-checkbox-button
+            type="is-success"
+            class="block userButton"
+            disabled="disabled"
+          >
             <div class="name">{{ fromUser.name }}</div>
           </b-checkbox-button>
           <figure class="image imageContainer">
@@ -50,7 +72,7 @@
               class="block userButton"
               disabled="disabled"
             >
-              <div class="name">{{user.name}}</div>
+              <div class="name">{{ user.name }}</div>
             </b-checkbox-button>
             <figure class="image imageContainer">
               <img class="myImage" :src="user.image.url" alt="Image" />
@@ -63,13 +85,13 @@
             class="deleteButton"
             type="is-danger"
             icon-left="trash"
-          >Delete</b-button>
+            >Delete</b-button
+          >
         </div>
       </section>
     </template>
   </div>
 </template>
-
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
@@ -79,7 +101,7 @@ import {
   Group,
   FinanceApi,
   FinanceEntry,
-  User
+  User,
 } from "@/generated/api-axios";
 import config from "@/../config";
 import { StateUtils } from "@/untils/StateUtils";
@@ -124,24 +146,20 @@ export default class ViewFinance extends Vue {
       confirmText: "Delete Entry",
       type: "is-danger",
       hasIcon: true,
-      onConfirm: () => this.deleteEntry()
+      onConfirm: () => this.deleteEntry(),
     });
   }
   private async deleteEntry() {
     const api = new FinanceApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
     try {
       this.loading = true;
       await api.financeFinanceIdDelete(this.financeId);
       this.$router.push({ name: RouterNames.FINANCE });
     } catch (e) {
-      this.$buefy.toast.open({
-        duration: 1000,
-        message: `Delete failed =(`,
-        type: "is-danger"
-      });
+      this.$toast.error(`Delete failed`);
     }
     this.loading = false;
   }
@@ -150,11 +168,11 @@ export default class ViewFinance extends Vue {
     this.loading = true;
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
     const financeApi = new FinanceApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
 
     const groupCall = groupApi.groupGroupIdGet(
