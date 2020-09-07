@@ -13,6 +13,9 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { ExceptionHandler } from "./untils/ExceptionHandler";
 import { NotificationUtils } from "./untils/NotificationUtils";
 
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
+
 //##########################################
 //setup vue
 library.add(fas);
@@ -22,6 +25,15 @@ Vue.use(Buefy, { defaultIconPack: "fas" });
 Vue.config.errorHandler = function(err, vm, info) {
   ExceptionHandler.handle(err, vm);
 };
+
+//https://maronato.github.io/vue-toastification/
+Vue.use(Toast, {
+  transition: "Vue-Toastification__bounce",
+  maxToasts: 20,
+  newestOnTop: true,
+  timeout: 1000,
+  position: "top-center",
+});
 
 Vue.config.productionTip = false;
 const vue = new Vue({

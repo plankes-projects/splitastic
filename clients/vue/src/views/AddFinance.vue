@@ -1,13 +1,18 @@
 <template>
   <div class>
-    <b-loading v-if="loading" :is-full-page="true" :active="loading"></b-loading>
+    <b-loading
+      v-if="loading"
+      :is-full-page="true"
+      :active="loading"
+    ></b-loading>
     <template v-if="atLeastOneRefreshDone">
       <b-button
         class="backButton"
         type="is-warning"
         icon-left="arrow-left"
         @click="backClicked()"
-      >Back</b-button>
+        >Back</b-button
+      >
 
       <div class="formData">
         <section>
@@ -23,10 +28,18 @@
             </b-field>
 
             <b-field label="Amount Spent (€)">
-              <b-input v-model="amount" placeholder="Amount" type="number" step="0.01" min="0.01"></b-input>
+              <b-input
+                v-model="amount"
+                placeholder="Amount"
+                type="number"
+                step="0.01"
+                min="0.01"
+              ></b-input>
             </b-field>
 
-            <b-button class="addButton" size="is-large" @click="add">Add</b-button>
+            <b-button class="addButton" size="is-large" @click="add"
+              >Add</b-button
+            >
 
             <p class="forLabel">
               <b>Who Paid?</b>
@@ -92,7 +105,7 @@ import {
   FinanceApi,
   FinanceEntry,
   FinanceEntryEntry,
-  User
+  User,
 } from "@/generated/api-axios";
 import config from "@/../config";
 import { StateUtils } from "@/untils/StateUtils";
@@ -114,7 +127,7 @@ export default class AddFinance extends Vue {
   private fromUser!: User;
 
   get filteredTitleArray() {
-    return this.titleSuggestions.filter(option => {
+    return this.titleSuggestions.filter((option) => {
       return (
         option
           .toString()
@@ -140,29 +153,17 @@ export default class AddFinance extends Vue {
 
   private async add() {
     if (this.userIdsForSpent.length == 0) {
-      this.$buefy.toast.open({
-        duration: 1000,
-        message: `Need at least one user`,
-        type: "is-danger"
-      });
+      this.$toast.error(`Need at least one user`);
       return;
     }
 
     if (!this.title) {
-      this.$buefy.toast.open({
-        duration: 1000,
-        message: `Title missing`,
-        type: "is-danger"
-      });
+      this.$toast.error(`Title missing`);
       return;
     }
 
     if (!this.amount) {
-      this.$buefy.toast.open({
-        duration: 1000,
-        message: `Amount missing`,
-        type: "is-danger"
-      });
+      this.$toast.error(`Amount missing`);
       return;
     }
 
@@ -182,7 +183,7 @@ export default class AddFinance extends Vue {
 
     const api = new FinanceApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
 
     this.loading = true;
@@ -198,11 +199,11 @@ export default class AddFinance extends Vue {
     this.loading = true;
     const groupApi = new GroupApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
     const financeApi = new FinanceApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
 
     const groupPromise = groupApi.groupGroupIdGet(

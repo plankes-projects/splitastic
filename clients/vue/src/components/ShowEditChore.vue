@@ -1,26 +1,42 @@
 <template>
   <div class="formData">
-    <b-loading v-if="loading" :is-full-page="true" :active="loading"></b-loading>
+    <b-loading
+      v-if="loading"
+      :is-full-page="true"
+      :active="loading"
+    ></b-loading>
     <template v-if="atLeastOneRefreshDone">
       <b-field label="Title">
         <b-input v-model="title" :readonly="readOnly"></b-input>
       </b-field>
       <b-field label="Description">
-        <b-input v-model="description" maxlength="255" type="textarea" :readonly="readOnly"></b-input>
+        <b-input
+          v-model="description"
+          maxlength="255"
+          type="textarea"
+          :readonly="readOnly"
+        ></b-input>
       </b-field>
       <section>
         <button class="button is-warning backButton" @click="back()">
           <span>BACK</span>
         </button>
 
-        <button v-if="isGroupOwner && readOnly" class="button" @click="editChoreClicked()">
+        <button
+          v-if="isGroupOwner && readOnly"
+          class="button"
+          @click="editChoreClicked()"
+        >
           <span>EDIT</span>
         </button>
 
         <template v-if="!readOnly">
           <b-button v-if="!savingDetails" @click="saveDetails">SAVE</b-button>
           <b-icon v-else icon="sync" type="is-success" class="fa-spin"></b-icon>
-          <button class="button is-danger deleteButton" @click="deleteChoreWithConfirm()">
+          <button
+            class="button is-danger deleteButton"
+            @click="deleteChoreWithConfirm()"
+          >
             <span>DELETE</span>
           </button>
         </template>
@@ -28,7 +44,6 @@
     </template>
   </div>
 </template>
-
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
@@ -52,7 +67,7 @@ export default class ShowEditChore extends Vue {
   private editChoreClicked() {
     this.$router.push({
       name: RouterNames.EDIT_CHORE,
-      params: { choreId: this.$route.params.choreId }
+      params: { choreId: this.$route.params.choreId },
     });
   }
 
@@ -64,20 +79,20 @@ export default class ShowEditChore extends Vue {
       confirmText: "Delete Chore",
       type: "is-danger",
       hasIcon: true,
-      onConfirm: () => this.deleteChore()
+      onConfirm: () => this.deleteChore(),
     });
   }
 
   private async deleteChore() {
     const api = new ChoreApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
 
     await api.choreChoreIdDelete(Number(this.$route.params.choreId));
     this.$router.push({
       name: RouterNames.CHORE,
-      params: { groupId: StateUtils.getActiveGroupId()!.toString() }
+      params: { groupId: StateUtils.getActiveGroupId()!.toString() },
     });
   }
 
@@ -89,19 +104,15 @@ export default class ShowEditChore extends Vue {
     this.savingDetails = true;
     const api = new ChoreApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
 
     await api.chorePut({
       title: this.title,
       description: this.description,
-      id: Number(this.$route.params.choreId)
+      id: Number(this.$route.params.choreId),
     });
-    this.$buefy.toast.open({
-      duration: 1000,
-      message: `Successfully updated`,
-      type: "is-success"
-    });
+    this.$toast.success(`Successfully updated`);
     this.savingDetails = false;
   }
 
@@ -109,7 +120,7 @@ export default class ShowEditChore extends Vue {
     this.loading = true;
     const api = new ChoreApi({
       basePath: config.basePath,
-      apiKey: StateUtils.getApiKey()
+      apiKey: StateUtils.getApiKey(),
     });
 
     const chore = (
@@ -129,7 +140,6 @@ export default class ShowEditChore extends Vue {
   }
 }
 </script>
-
 
 <style scoped lang="scss">
 .formData {
