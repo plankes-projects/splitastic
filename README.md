@@ -1,6 +1,6 @@
 # Splitastic
 
-Splitastic is an open source self hosted chores/expenses splitting app.
+Splitastic is an open source self hosted chores/expenses splitting app, an alternative to those ad cluttered apps like Flatastic, HomeSlice or FlatMate.
 
 The app can be used to track expenses and chores of multiple groups. In a household or vacation. It is actively used and improved by the repository owner.
 
