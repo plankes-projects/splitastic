@@ -1,9 +1,7 @@
 package com.epicnerf.hibernate.dao;
 
 import com.epicnerf.hibernate.model.FinanceEntry;
-import com.epicnerf.hibernate.model.FinanceEntryEntry;
 import com.epicnerf.hibernate.model.GroupObject;
-import com.epicnerf.hibernate.repository.FinanceEntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +16,6 @@ public class FinanceEntryDao {
 
     @Autowired
     private EntityManager entityManager;
-    @Autowired
-    private FinanceEntryRepository financeEntryRepository;
 
     @Transactional
     public void deleteAllFinanceEntries(GroupObject group) {
@@ -49,8 +45,6 @@ public class FinanceEntryDao {
 
     @Transactional
     public void moveFinanceToUser(int groupId, int fromUserId, int toUserId) {
-        distributeRedundantEntries(toUserId);
-
         String query = "update finance_entry  join finance_entry_entries on finance_entry_entries.finance_entry_id = finance_entry.id ";
         query += "join finance_entry_entry on finance_entry_entries.entries_id = finance_entry_entry.id ";
         query += "set finance_entry_entry.spent_for_id = :toUserId ";
@@ -98,40 +92,6 @@ public class FinanceEntryDao {
                 .setParameter("userId", userId)
                 .getSingleResult();
         return exists.intValue() > 0;
-    }
-
-    private void distributeRedundantEntries(int toUserId) {
-        //noinspection unchecked
-        List<Integer> redundantEntryIds = (List<Integer>) entityManager
-                .createNativeQuery("select id from finance_entry_entry where spent_for_id = :toUserId")
-                .setParameter("toUserId", toUserId)
-                .getResultList();
-        redundantEntryIds.forEach(this::fixRedundantEntry);
-    }
-
-    private void fixRedundantEntry(int redundantEntryId) {
-        String query = "select finance_entry_id from finance_entry_entries where finance_entry_entries.entries_id = :entryId";
-
-        Integer financeId = (Integer) entityManager
-                .createNativeQuery(query)
-                .setParameter("entryId", redundantEntryId)
-                .getSingleResult();
-
-        FinanceEntry entry = financeEntryRepository.findById(financeId).orElse(null);
-
-
-        assert entry != null;
-        FinanceEntryEntry redundantEntry = entry.getEntries().stream()
-                .filter(e -> e.getId().equals(redundantEntryId))
-                .findAny()
-                .orElse(null);
-
-        assert redundantEntry != null;
-        float addToOther = redundantEntry.getAmount() / (entry.getEntries().size() - 1);
-        entry.getEntries().forEach(e -> e.setAmount(e.getAmount() + addToOther));
-        entry.getEntries().remove(redundantEntry);
-
-        financeEntryRepository.save(entry);
     }
 
     public List<FinanceEntry> paginateFinanceEntries(GroupObject group, int limit, Integer lastId) {
