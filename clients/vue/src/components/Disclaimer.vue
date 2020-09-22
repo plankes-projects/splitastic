@@ -5,7 +5,7 @@
       Splitastic is a private project and is hosted on a private server.
       You can use Splitastic for free and it does not generate any revenue.
       Use Splitastic on your own risk.
-      All data could be lost in the unlikely case of hardware failure !
+      All data could be lost in the unlikely case of hardware failure!
     </p>
   </b-message>
 </template>
