@@ -118,7 +118,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
             f.setGroup(group.get());
             financeEntryRepository.save(f);
             notificationManager.onFinanceEntryAdded(f);
-
+            groupObjectDao.updateActivity(group.get());
             return ResponseEntity.ok(openApiMapper.map(f));
         }
         throw new NoResultException();

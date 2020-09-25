@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Component
@@ -17,20 +18,22 @@ public class GroupObjectDao {
     @Autowired
     private GroupObjectRepository groupObjectRepository;
 
+    @Transactional
+    public void updateActivity(GroupObject group) {
+        entityManager
+                .createNativeQuery("update group_object set last_activity_date = CURRENT_TIMESTAMP where id = :id")
+                .setParameter("id", group.getId())
+                .executeUpdate();
+    }
+
     public List<GroupObject> paginateGroups(User user, int limit, Integer lastId) {
         String query = "SELECT u.* FROM group_object_users m ";
         query += "join group_object u on m.group_object_id = u.id ";
-        query += "where id < :id ";
-        query += "and m.users_id = :user_id ORDER BY u.id desc";
-
-        if (lastId == null) {
-            lastId = Integer.MAX_VALUE;
-        }
+        query += "where m.users_id = :user_id ORDER BY u.last_activity_date desc";
 
         //noinspection unchecked
         return (List<GroupObject>) entityManager
                 .createNativeQuery(query, GroupObject.class)
-                .setParameter("id", lastId)
                 .setParameter("user_id", user.getId())
                 .setMaxResults(limit)
                 .getResultList();

@@ -2,6 +2,7 @@ package com.epicnerf.api;
 
 import com.epicnerf.hibernate.MapToOpenApiModel;
 import com.epicnerf.hibernate.dao.ChoreDao;
+import com.epicnerf.hibernate.dao.GroupObjectDao;
 import com.epicnerf.hibernate.model.Chore;
 import com.epicnerf.hibernate.model.ChoreEntry;
 import com.epicnerf.hibernate.model.GroupObject;
@@ -41,6 +42,9 @@ public class ChoreApiDelegateImpl implements ChoreApiDelegate {
     @Autowired
     private NotificationManager notificationManager;
 
+    @Autowired
+    private GroupObjectDao groupObjectDao;
+
     public ResponseEntity<Void> choreChoreIdDelete(Integer choreId) {
         User user = apiSupport.getCurrentUser();
         Optional<Chore> chore = choreRepository.findById(choreId);
@@ -60,6 +64,7 @@ public class ChoreApiDelegateImpl implements ChoreApiDelegate {
             apiSupport.validateUserIsInGroup(chore.get().getGroup(), user.getId());
             choreDao.deleteLatestChoreEntry(chore.get(), user);
             notificationManager.onChoreEntryDeleted(user, chore.get());
+            groupObjectDao.updateActivity(chore.get().getGroup());
             return new ResponseEntity<>(HttpStatus.OK);
         }
 
@@ -77,6 +82,7 @@ public class ChoreApiDelegateImpl implements ChoreApiDelegate {
             entry.setUser(user);
             choreEntryRepository.save(entry);
             notificationManager.onChoreEntryAdded(user, chore.get());
+            groupObjectDao.updateActivity(chore.get().getGroup());
             return new ResponseEntity<>(HttpStatus.OK);
         }
 

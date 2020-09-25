@@ -40,6 +40,11 @@ public class GroupObject {
     @ManyToOne(cascade = {CascadeType.ALL})
     private ImageData image;
 
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, columnDefinition = "datetime default CURRENT_TIMESTAMP")
+    private Date lastActivityDate;
+
     public String getDescription() {
         return description;
     }
