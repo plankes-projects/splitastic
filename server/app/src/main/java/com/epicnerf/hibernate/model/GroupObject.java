@@ -42,7 +42,7 @@ public class GroupObject {
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false, columnDefinition = "datetime default CURRENT_TIMESTAMP")
+    @Column(nullable = false, columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP")
     private Date lastActivityDate;
 
     public String getDescription() {
