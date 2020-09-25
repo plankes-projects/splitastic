@@ -2,6 +2,7 @@ package com.epicnerf.api;
 
 import com.epicnerf.hibernate.MapToHibernateModel;
 import com.epicnerf.hibernate.MapToOpenApiModel;
+import com.epicnerf.hibernate.dao.GroupObjectDao;
 import com.epicnerf.hibernate.model.FinanceEntry;
 import com.epicnerf.hibernate.model.User;
 import com.epicnerf.hibernate.repository.FinanceEntryRepository;
@@ -33,6 +34,9 @@ public class FinanceApiDelegateImpl implements FinanceApiDelegate {
     @Autowired
     private NotificationManager notificationManager;
 
+    @Autowired
+    private GroupObjectDao groupObjectDao;
+
     public ResponseEntity<Void> financeFinanceIdDelete(Integer financeId) {
         Optional<FinanceEntry> finance = financeEntryRepository.findById(financeId);
 
@@ -40,6 +44,7 @@ public class FinanceApiDelegateImpl implements FinanceApiDelegate {
         if (finance.isPresent() && canDelete(finance.get(), user)) {
             financeEntryRepository.delete(finance.get());
             notificationManager.onFinanceEntryDelete(user, finance.get());
+            groupObjectDao.updateActivity(finance.get().getGroup());
             return new ResponseEntity<>(HttpStatus.OK);
         }
         throw new NoResultException();
