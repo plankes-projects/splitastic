@@ -88,6 +88,7 @@ public class LoginApiDelegateImpl implements LoginApiDelegate {
     }
 
     public ResponseEntity<LoginData> loginPost(String email) {
+        email = email.trim();
         LoginData ret = new LoginData();
         ret.setEmail(email);
         ret.setToken(UUID.randomUUID().toString());

@@ -242,6 +242,7 @@ public class GroupApiDelegateImpl implements GroupApiDelegate {
     }
 
     public ResponseEntity<Void> groupGroupIdUserEmailPut(Integer groupId, String email) {
+        email = email.trim();
         User user = apiSupport.getCurrentUser();
         Optional<GroupObject> g = groupObjectRepository.findById(groupId);
 
