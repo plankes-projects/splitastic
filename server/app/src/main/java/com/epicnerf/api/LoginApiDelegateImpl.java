@@ -95,8 +95,6 @@ public class LoginApiDelegateImpl implements LoginApiDelegate {
 
         User user = userDao.getOrCreateUserWithEmail(email);
 
-        loginTokenDao.deleteLoginToken(user);
-
         boolean approved = apiSupport.hasAdminToken();
 
         LoginToken token = new LoginToken();

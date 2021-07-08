@@ -23,7 +23,7 @@ public class LoginToken {
     @Column(name = "modify_date", nullable = false)
     private Date modifyDate;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     private User user;
 
     @Column(length = 36, unique = true, nullable = false)

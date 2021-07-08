@@ -14,15 +14,6 @@ public class LoginTokenDao {
     @Autowired
     private EntityManager entityManager;
 
-    @Transactional
-    public void deleteLoginToken(User user) {
-        String table = LoginToken.class.getSimpleName();
-        entityManager
-                .createQuery("delete from " + table + " where user_id = :uid")
-                .setParameter("uid", user.getId())
-                .executeUpdate();
-    }
-
     @Transactional(dontRollbackOn = RuntimeException.class)
     public LoginToken getLoginTokenWithProof(String proof) {
         deleteOldLoginTokens();
