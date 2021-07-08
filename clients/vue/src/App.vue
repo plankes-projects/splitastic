@@ -34,6 +34,7 @@ import { StateUtils } from "./untils/StateUtils";
 
 @Component
 export default class App extends Vue {
+  
   private isActive = false;
   private hasApiKey = true;
   private routeHome = RouterNames.HOME;
@@ -46,7 +47,6 @@ export default class App extends Vue {
   @Watch("$route")
   private routeChanged() {
     this.hasApiKey = StateUtils.hasApiKey();
-
     if (this.$router.currentRoute.name == RouterNames.ERROR) {
       return;
     }
@@ -56,6 +56,9 @@ export default class App extends Vue {
     if (this.$router.currentRoute.name == RouterNames.LOGOUT) {
       return;
     }
+    if (this.$router.currentRoute.name == RouterNames.LOGIN_WITH_TOKEN) {
+      return;
+    }
 
     if (
       !this.hasApiKey &&
@@ -63,10 +66,6 @@ export default class App extends Vue {
     ) {
       this.$router.push({ name: RouterNames.LOGIN });
     }
-  }
-
-  private created() {
-    this.routeChanged();
   }
 
   private mounted() {

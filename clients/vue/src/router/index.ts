@@ -21,6 +21,11 @@ const routes: Array<RouteConfig> = [
     component: () => import("../views/Login.vue"),
   },
   {
+    path: "/loginWithToken",
+    name: RouterNames.LOGIN_WITH_TOKEN,
+    component: () => import("../views/loginWithToken.vue"),
+  },
+  {
     path: "/logout",
     name: RouterNames.LOGOUT,
     component: () => import("../views/Logout.vue"),

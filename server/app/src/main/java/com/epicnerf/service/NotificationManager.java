@@ -1,22 +1,50 @@
 package com.epicnerf.service;
 
+import com.epicnerf.api.LoginApiDelegateImpl;
 import com.epicnerf.databean.NotificationRoutingInfo;
 import com.epicnerf.enums.ClientView;
 import com.epicnerf.hibernate.dao.NotificationDao;
 import com.epicnerf.hibernate.model.*;
+import com.epicnerf.hibernate.repository.LoginTokenRepository;
+import org.apache.commons.text.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import javax.mail.internet.MimeMessage;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.Collections;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class NotificationManager {
 
+    Logger logger = LoggerFactory.getLogger(NotificationManager.class);
+
     private final DecimalFormat decimalFormat;
 
     @Autowired
+    private LoginTokenRepository loginTokenRepository;
+
+    @Autowired
     private NotificationDao notificationDao;
+
+    @Autowired
+    private JavaMailSender javaMailSender;
+
+    @Value("${email.from}")
+    private String emailFrom;
+
+    @Value("${client.baseurl}")
+    private String clientBaseUrl;
 
     public NotificationManager() {
         decimalFormat = new DecimalFormat();
@@ -136,6 +164,48 @@ public class NotificationManager {
         String body = "Group: " + groupInvite.getGroup().getName();
         NotificationRoutingInfo info = new NotificationRoutingInfo(groupInvite.getGroup().getId(), ClientView.FINANCE);
         notificationDao.insertForAllDevicesOfUser(info, title, body, groupInvite.getInvitedUser());
+
+        sendGroupInviteEmail(groupInvite);
+    }
+
+    private void sendGroupInviteEmail(GroupInvite groupInvite) {
+        try {
+            String token = createApprovedToken(groupInvite.getInvitedUser());
+            String html = loadEmailHtml(token);
+
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+            helper.setText(html, true);
+            helper.setTo(groupInvite.getInvitedUser().getEmail());
+            helper.setSubject("New group invite on Splitastic");
+            helper.setFrom(emailFrom);
+            javaMailSender.send(mimeMessage);
+            logger.info("Sent group inv login email to: " + groupInvite.getInvitedUser().getEmail());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String createApprovedToken(User user) {
+        String tokenString = UUID.randomUUID().toString();
+        LoginToken token = new LoginToken();
+        token.setUser(user);
+        token.setToken(tokenString);
+        token.setApproved(true);
+        loginTokenRepository.save(token);
+        return tokenString;
+    }
+
+    private String loadEmailHtml(String token) throws IOException {
+        String url = clientBaseUrl + "/loginWithToken?token=" + token;
+        String href = "<a href=\"" + url + "\">" + StringEscapeUtils.escapeHtml4(url) + "</a>";
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/templates/groupInviteReceivedEmail.html")))) {
+            String template = br.lines().collect(Collectors.joining());
+            template = template
+                    .replace("!!url!!", href);
+            return template;
+        }
     }
 
     public void onGroupInviteDeleted(User user, GroupInvite groupInvite) {

@@ -1,5 +1,6 @@
 export class RouterNames {
   public static readonly LOGIN = "Login";
+  public static readonly LOGIN_WITH_TOKEN = "LoginWithToken";
   public static readonly HOME = "Home";
   public static readonly LOGOUT = "Logout";
   public static readonly ABOUT = "About";
