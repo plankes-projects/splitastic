@@ -35,7 +35,7 @@
             Verify code:
             <b>{{ loginData.verify }}</b>
           </div>
-          <div>This email may take up to 10 minutes to arrive.</div>
+          <div>This email may take some minutes to arrive.</div>
           <b-button @click="userOtherEmailCLicked">Use other email</b-button>
         </section>
       </div>
