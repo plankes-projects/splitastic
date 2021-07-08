@@ -23,7 +23,9 @@ public class LoginTokenDao {
                 .executeUpdate();
     }
 
+    @Transactional(dontRollbackOn = RuntimeException.class)
     public LoginToken getLoginTokenWithProof(String proof) {
+        deleteOldLoginTokens();
         String table = LoginToken.class.getSimpleName();
         return entityManager
                 .createQuery("SELECT u FROM " + table + " u where secret = :secret", LoginToken.class)
@@ -31,11 +33,19 @@ public class LoginTokenDao {
                 .getSingleResult();
     }
 
+    @Transactional(dontRollbackOn = RuntimeException.class)
     public LoginToken getLoginTokenWithToken(String token) {
+        deleteOldLoginTokens();
         String table = LoginToken.class.getSimpleName();
         return entityManager
                 .createQuery("SELECT u FROM " + table + " u where token = :token", LoginToken.class)
                 .setParameter("token", token)
                 .getSingleResult();
+    }
+
+    private void deleteOldLoginTokens() {
+        entityManager
+            .createNativeQuery("DELETE FROM login_token where create_date < now() - interval 14 DAY")
+            .executeUpdate();
     }
 }

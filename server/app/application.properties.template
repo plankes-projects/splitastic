@@ -13,6 +13,7 @@ admin.token=randomStringWithMinLengthOf100
 #
 # general
 #
+client.baseurl=http://localhost:8082
 server.baseurl=http://localhost:8081
 server.port=8081
 #
