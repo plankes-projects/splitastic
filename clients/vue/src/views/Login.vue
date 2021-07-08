@@ -56,7 +56,7 @@
 </template>
 
 <script lang="ts">
-//&#169; Splitastic {{ new Date().getFullYear() }} -
+
 import { Component, Vue } from "vue-property-decorator";
 import config from "@/../config";
 import { Configuration } from "@/generated/api-axios/configuration";
