@@ -35,11 +35,13 @@
       </table>
     </div>
 
-    <div v-if="choreSum.chore.description" class="panel-block">
+    <div class="panel-block">
       <a class="infoButton" @click="showChoreClicked()">
         <b-icon icon="info-circle" size="is-small"></b-icon>
       </a>
-      {{ choreSum.chore.description }}
+      <template v-if="choreSum.chore.description">
+        {{ choreSum.chore.description }}
+      </template>
     </div>
     <div class="userList">
       <div
