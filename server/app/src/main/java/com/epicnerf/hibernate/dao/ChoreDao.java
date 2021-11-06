@@ -9,6 +9,7 @@ import com.epicnerf.hibernate.repository.ChoreRepository;
 import com.epicnerf.hibernate.repository.UserRepository;
 import com.epicnerf.model.ChoreSummary;
 import com.epicnerf.model.ChoreSummaryArrayEntry;
+import com.epicnerf.service.CsvUtilsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +36,9 @@ public class ChoreDao {
 
     @Autowired
     private ChoreRepository choreRepository;
+
+    @Autowired
+    private CsvUtilsService csvUtilsService;
 
     @Transactional
     public void deleteChore(Chore chore) {
@@ -110,5 +114,20 @@ public class ChoreDao {
                 .setParameter("choreId", chore.getId())
                 .setParameter("userId", user.getId())
                 .executeUpdate();
+    }
+
+    @Transactional
+    public List<Object[]>  getExportDataByGroupIdAsCsvString(int groupId) {
+        String query = "select chore_id, chore.title as chore_title, user_id, user.name as user_title, chore_entry.create_date from chore";
+        query += "\njoin chore_entry on chore_entry.chore_id = chore.id";
+        query += "\njoin user on chore_entry.user_id = user.id";
+        query += "\nwhere group_id = :group_id";
+        query += "\norder by chore_id, create_date";
+
+        //noinspection unchecked
+        return (List<Object[]>)entityManager
+                .createNativeQuery(query)
+                .setParameter("group_id", groupId)
+                .getResultList();
     }
 }

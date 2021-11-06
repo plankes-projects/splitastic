@@ -11,8 +11,11 @@ import com.epicnerf.hibernate.repository.ChoreEntryRepository;
 import com.epicnerf.hibernate.repository.ChoreRepository;
 import com.epicnerf.hibernate.repository.GroupObjectRepository;
 import com.epicnerf.model.ChoreSummary;
+import com.epicnerf.service.ExportService;
 import com.epicnerf.service.NotificationManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -44,6 +47,8 @@ public class ChoreApiDelegateImpl implements ChoreApiDelegate {
 
     @Autowired
     private GroupObjectDao groupObjectDao;
+    @Autowired
+    private ExportService exportService;
 
     public ResponseEntity<Void> choreChoreIdDelete(Integer choreId) {
         User user = apiSupport.getCurrentUser();
@@ -141,4 +146,16 @@ public class ChoreApiDelegateImpl implements ChoreApiDelegate {
         throw new NoResultException();
     }
 
+    public ResponseEntity<org.springframework.core.io.Resource> choreExportGroupGroupIdGet(Integer groupId) {
+        User user = apiSupport.getCurrentUser();
+        Optional<GroupObject> group = groupObjectRepository.findById(groupId);
+        if (group.isPresent()) {
+            apiSupport.validateUserIsInGroup(group.get(), user.getId());
+            String csvString = exportService.getChoreExportDataByGroupIdAsCsvString(groupId);
+            Resource resource = new ByteArrayResource(csvString.getBytes());
+            return ResponseEntity.ok(resource);
+        }
+
+        throw new NoResultException();
+    }
 }

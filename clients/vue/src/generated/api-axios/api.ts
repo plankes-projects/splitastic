@@ -883,6 +883,50 @@ export const ChoreApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * 
+         * @summary Exports all chore data as csv
+         * @param {number} groupId The id of the group.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        choreExportGroupGroupIdGet: async (groupId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'groupId' is not null or undefined
+            if (groupId === null || groupId === undefined) {
+                throw new RequiredError('groupId','Required parameter groupId was null or undefined when calling choreExportGroupGroupIdGet.');
+            }
+            const localVarPath = `/chore/export/group/{groupId}`
+                .replace(`{${"groupId"}}`, encodeURIComponent(String(groupId)));
+            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuthHeader required
+            if (configuration && configuration.apiKey) {
+                const localVarApiKeyValue = typeof configuration.apiKey === 'function'
+                    ? await configuration.apiKey("X-API-KEY")
+                    : await configuration.apiKey;
+                localVarHeaderParameter["X-API-KEY"] = localVarApiKeyValue;
+            }
+
+
+    
+            localVarUrlObj.query = {...localVarUrlObj.query, ...localVarQueryParameter, ...options.query};
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            const headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: globalImportUrl.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Creates a new chore.
          * @param {number} groupId The id of the group.
          * @param {*} [options] Override http request option.
@@ -1086,6 +1130,20 @@ export const ChoreApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Exports all chore data as csv
+         * @param {number} groupId The id of the group.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async choreExportGroupGroupIdGet(groupId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await ChoreApiAxiosParamCreator(configuration).choreExportGroupGroupIdGet(groupId, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary Creates a new chore.
          * @param {number} groupId The id of the group.
          * @param {*} [options] Override http request option.
@@ -1177,6 +1235,16 @@ export const ChoreApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * 
+         * @summary Exports all chore data as csv
+         * @param {number} groupId The id of the group.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        choreExportGroupGroupIdGet(groupId: number, options?: any): AxiosPromise<any> {
+            return ChoreApiFp(configuration).choreExportGroupGroupIdGet(groupId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Creates a new chore.
          * @param {number} groupId The id of the group.
          * @param {*} [options] Override http request option.
@@ -1265,6 +1333,18 @@ export class ChoreApi extends BaseAPI {
 
     /**
      * 
+     * @summary Exports all chore data as csv
+     * @param {number} groupId The id of the group.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ChoreApi
+     */
+    public choreExportGroupGroupIdGet(groupId: number, options?: any) {
+        return ChoreApiFp(this.configuration).choreExportGroupGroupIdGet(groupId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Creates a new chore.
      * @param {number} groupId The id of the group.
      * @param {*} [options] Override http request option.
@@ -1308,6 +1388,50 @@ export class ChoreApi extends BaseAPI {
  */
 export const FinanceApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @summary Exports all chore data as csv
+         * @param {number} groupId The id of the group.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        financeExportGroupGroupIdGet: async (groupId: number, options: any = {}): Promise<RequestArgs> => {
+            // verify required parameter 'groupId' is not null or undefined
+            if (groupId === null || groupId === undefined) {
+                throw new RequiredError('groupId','Required parameter groupId was null or undefined when calling financeExportGroupGroupIdGet.');
+            }
+            const localVarPath = `/finance/export/group/{groupId}`
+                .replace(`{${"groupId"}}`, encodeURIComponent(String(groupId)));
+            const localVarUrlObj = globalImportUrl.parse(localVarPath, true);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuthHeader required
+            if (configuration && configuration.apiKey) {
+                const localVarApiKeyValue = typeof configuration.apiKey === 'function'
+                    ? await configuration.apiKey("X-API-KEY")
+                    : await configuration.apiKey;
+                localVarHeaderParameter["X-API-KEY"] = localVarApiKeyValue;
+            }
+
+
+    
+            localVarUrlObj.query = {...localVarUrlObj.query, ...localVarQueryParameter, ...options.query};
+            // fix override query string Detail: https://stackoverflow.com/a/7517673/1077943
+            delete localVarUrlObj.search;
+            const headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: globalImportUrl.format(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @summary Removes the finance entry.
@@ -1609,6 +1733,20 @@ export const FinanceApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Exports all chore data as csv
+         * @param {number} groupId The id of the group.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async financeExportGroupGroupIdGet(groupId: number, options?: any): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
+            const localVarAxiosArgs = await FinanceApiAxiosParamCreator(configuration).financeExportGroupGroupIdGet(groupId, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary Removes the finance entry.
          * @param {number} financeId The id of the finance entry.
          * @param {*} [options] Override http request option.
@@ -1705,6 +1843,16 @@ export const FinanceApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
+         * @summary Exports all chore data as csv
+         * @param {number} groupId The id of the group.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        financeExportGroupGroupIdGet(groupId: number, options?: any): AxiosPromise<any> {
+            return FinanceApiFp(configuration).financeExportGroupGroupIdGet(groupId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Removes the finance entry.
          * @param {number} financeId The id of the finance entry.
          * @param {*} [options] Override http request option.
@@ -1776,6 +1924,18 @@ export const FinanceApiFactory = function (configuration?: Configuration, basePa
  * @extends {BaseAPI}
  */
 export class FinanceApi extends BaseAPI {
+    /**
+     * 
+     * @summary Exports all chore data as csv
+     * @param {number} groupId The id of the group.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FinanceApi
+     */
+    public financeExportGroupGroupIdGet(groupId: number, options?: any) {
+        return FinanceApiFp(this.configuration).financeExportGroupGroupIdGet(groupId, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Removes the finance entry.

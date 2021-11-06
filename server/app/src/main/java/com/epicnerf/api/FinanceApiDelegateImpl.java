@@ -2,13 +2,19 @@ package com.epicnerf.api;
 
 import com.epicnerf.hibernate.MapToHibernateModel;
 import com.epicnerf.hibernate.MapToOpenApiModel;
+import com.epicnerf.hibernate.dao.FinanceDao;
 import com.epicnerf.hibernate.dao.GroupObjectDao;
 import com.epicnerf.hibernate.model.FinanceEntry;
+import com.epicnerf.hibernate.model.GroupObject;
 import com.epicnerf.hibernate.model.User;
 import com.epicnerf.hibernate.repository.FinanceEntryRepository;
+import com.epicnerf.hibernate.repository.GroupObjectRepository;
 import com.epicnerf.model.FinanceEntryEntry;
+import com.epicnerf.service.ExportService;
 import com.epicnerf.service.NotificationManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -36,6 +42,25 @@ public class FinanceApiDelegateImpl implements FinanceApiDelegate {
 
     @Autowired
     private GroupObjectDao groupObjectDao;
+    @Autowired
+    private GroupObjectRepository groupObjectRepository;
+    @Autowired
+    private FinanceDao financeDao;
+    @Autowired
+    private ExportService exportService;
+
+    public ResponseEntity<org.springframework.core.io.Resource> financeExportGroupGroupIdGet(Integer groupId) {
+        User user = apiSupport.getCurrentUser();
+        Optional<GroupObject> group = groupObjectRepository.findById(groupId);
+        if (group.isPresent()) {
+            apiSupport.validateUserIsInGroup(group.get(), user.getId());
+            String csvString = exportService.getFinanceExportDataByGroupIdAsCsvString(group.get());
+            Resource resource = new ByteArrayResource(csvString.getBytes());
+            return ResponseEntity.ok(resource);
+        }
+
+        throw new NoResultException();
+    }
 
     public ResponseEntity<Void> financeFinanceIdDelete(Integer financeId) {
         Optional<FinanceEntry> finance = financeEntryRepository.findById(financeId);

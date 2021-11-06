@@ -79,6 +79,22 @@
           </a>
         </div>
       </div>
+
+      <div class="panel">
+          <b-button
+            class="export-button"
+            type="is-warning"
+            icon-left="download"
+            @click="exportFinanceWithConfirm()"
+          >Export Finance</b-button>
+          <b-button
+            class="export-button"
+            type="is-warning"
+            icon-left="download"
+            @click="exportChoresWithConfirm()"
+          >Export Chores</b-button>
+      </div>
+
       <div v-if="!readOnly" class="addImaginaryFriendButtonContainer">
         <b-button
           type="is-success"
@@ -135,7 +151,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { Group, GroupApi, Invite, UserApi, User } from "@/generated/api-axios";
+import { Group, GroupApi, Invite, UserApi, User, ChoreApi, FinanceApi } from "@/generated/api-axios";
 import config from "@/../config";
 import { RouterNames } from "@/untils/RouterNames";
 import { FileUtils } from "@/untils/FileUtils";
@@ -191,6 +207,69 @@ export default class ShowEditGroup extends Vue {
 
   private async addImaginaryFriend() {
     this.isAddImaginaryFriendModalActive = true;
+  }
+
+  private async exportChoresWithConfirm() {
+    this.$buefy.dialog.confirm({
+      title: "Export Chores",
+      message: "Are you sure you want to export all chores?",
+      confirmText: "Export",
+      type: "is-warning",
+      hasIcon: true,
+      onConfirm: () => this.exportChores()
+    });
+  }
+
+  private async exportChores() {
+    const api = new ChoreApi({
+      basePath: config.basePath,
+      apiKey: StateUtils.getApiKey()
+    });
+
+    try {
+      this.loading = true;
+      const apiResult = (await api.choreExportGroupGroupIdGet(Number(this.group.id))).data;
+      this.downloadToFile("export-chores.csv", apiResult);
+    } catch (e) {
+      this.$toast.error(`Export failed`);
+    }
+    this.loading = false;
+  }
+
+  private downloadToFile(fileaName: string, content:string) {
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileaName;
+      link.click();
+      URL.revokeObjectURL(link.href);
+  }
+  
+  private async exportFinance() {
+    const api = new FinanceApi({
+      basePath: config.basePath,
+      apiKey: StateUtils.getApiKey()
+    });
+
+    try {
+      this.loading = true;
+      const apiResult = (await api.financeExportGroupGroupIdGet(Number(this.group.id))).data;
+      this.downloadToFile("export-finance.csv", apiResult);
+    } catch (e) {
+      this.$toast.error(`Export failed`);
+    }
+    this.loading = false;
+  }
+
+  private async exportFinanceWithConfirm() {
+    this.$buefy.dialog.confirm({
+      title: "Export finance",
+      message: "Are you sure you want to export all finance?",
+      confirmText: "Export",
+      type: "is-warning",
+      hasIcon: true,
+      onConfirm: () => this.exportFinance()
+    });
   }
 
   private async leaveGroupWithConfirm() {
@@ -424,5 +503,9 @@ export default class ShowEditGroup extends Vue {
   background-color: $transbarentBackground;
   padding: $formDataPadding;
   margin: 1em;
+}
+
+.export-button{
+  margin: 0.5em;
 }
 </style>
