@@ -10,6 +10,7 @@ import javax.persistence.Query;
 import javax.transaction.Transactional;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class FinanceEntryDao {
@@ -159,10 +160,13 @@ public class FinanceEntryDao {
         int numResults = 50;
         //noinspection unchecked
         List<String> suggestions = (List<String>) entityManager
-                .createNativeQuery("select distinct title from finance_entry where spent_from_id = :userId and group_id = :groupId order by id desc limit " + numResults)
+                .createNativeQuery("select title from finance_entry where spent_from_id = :userId and group_id = :groupId order by id desc limit " + numResults)
                 .setParameter("userId", userId)
                 .setParameter("groupId", groupId)
-                .getResultList();
+                .getResultList()
+                .stream()
+                .distinct()
+                .collect(Collectors.toList());
 
         if (suggestions.size() < numResults) {
             int limit = numResults - suggestions.size();
@@ -170,7 +174,7 @@ public class FinanceEntryDao {
             String titlePart = suggestions.size() == 0 ? "" : "and title not in (:titles)";
 
             Query q = entityManager
-                    .createNativeQuery("select distinct title from finance_entry where spent_from_id = :userId " + titlePart + " order by id desc limit " + limit)
+                    .createNativeQuery("select title from finance_entry where spent_from_id = :userId " + titlePart + " order by id desc limit " + limit)
                     .setParameter("userId", userId);
 
             if (suggestions.size() != 0) {
@@ -178,7 +182,10 @@ public class FinanceEntryDao {
             }
 
             //noinspection unchecked
-            q.getResultList().forEach(o -> suggestions.add((String) o));
+            q.getResultList()
+                    .stream()
+                    .distinct()
+                    .forEach(o -> suggestions.add((String) o));
         }
         return suggestions;
     }

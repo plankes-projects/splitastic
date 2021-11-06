@@ -597,6 +597,28 @@ paths:
           description: The task was successfully inserted.
         '204':
           description: Resource not found.
+
+  /finance/export/group/{groupId}:
+    get:
+      tags:
+        - "Finance"
+      summary:  Exports all chore data as csv
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+      responses:
+        '200':
+          description: the csv content
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+
   /chore:
     post:
       tags:
@@ -722,6 +744,27 @@ paths:
       responses:
         '200':
           description: Success
+
+  /chore/export/group/{groupId}:
+    get:
+      tags:
+        - "Chore"
+      summary:  Exports all chore data as csv
+      parameters:
+        - in: path
+          name: groupId
+          required: true
+          schema:
+            type: integer
+          description: The id of the group.
+      responses:
+        '200':
+          description: the csv content
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
 
 components:
   securitySchemes:
