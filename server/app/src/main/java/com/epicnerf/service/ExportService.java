@@ -63,12 +63,6 @@ public class ExportService {
     }
 
     private String[] mapFinanceExportRow(HashMap<Integer, User> userIdToUser, List<Object[]> rows) {
-        //finance_entry.id, finance_entry.title, spent_from_id, spent_for_id, amount, create_date
-        // build one line of this:
-        // title; nina;klaus; Stephan; created
-        // test; -10;-10;20
-        // test; 30;-30;0
-
         HashMap<Integer, Float> userIdToAmountSum = new HashMap<>();
         float total = 0.0f;
         for(Object[] row : rows){
