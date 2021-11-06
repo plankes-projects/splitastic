@@ -229,7 +229,8 @@ export default class ShowEditGroup extends Vue {
     try {
       this.loading = true;
       const apiResult = (await api.choreExportGroupGroupIdGet(Number(this.group.id))).data;
-      this.downloadToFile("export-chores.csv", apiResult);
+      const name = "export-chores-"+(new Date().toISOString())+".csv";
+      this.downloadToFile(name, apiResult);
     } catch (e) {
       this.$toast.error(`Export failed`);
     }
@@ -254,7 +255,8 @@ export default class ShowEditGroup extends Vue {
     try {
       this.loading = true;
       const apiResult = (await api.financeExportGroupGroupIdGet(Number(this.group.id))).data;
-      this.downloadToFile("export-finance.csv", apiResult);
+      const name = "export-finance-"+(new Date().toISOString())+".csv";
+      this.downloadToFile(name, apiResult);
     } catch (e) {
       this.$toast.error(`Export failed`);
     }
