@@ -6,7 +6,6 @@ The app can be used to track expenses and chores of multiple groups. In a househ
 
 Mobile phones are first class citizens in this app. This means you should use this app on a mobile phone for the best experience.
 
-See it in action here: https://splitastic.epicnerf.com/
 
 ## Why another chores/expenses splitting app you ask?
 There is no free (no ads), open source or self hosted alternative to all those apps out there.
